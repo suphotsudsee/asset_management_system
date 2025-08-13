@@ -221,10 +221,10 @@ class Guarantee_model extends CI_Model {
      */
     public function get_guarantee_providers()
     {
-        $this->db->select('DISTINCT guarantee_provider');
-        $this->db->order_by('guarantee_provider', 'ASC');
+        $this->db->select('DISTINCT vendor_name');
+        $this->db->order_by('vendor_name', 'ASC');
         $query = $this->db->get('contract_guarantees');
-        return array_column($query->result_array(), 'guarantee_provider');
+        return array_column($query->result_array(), 'vendor_name');
     }
 
     /**
@@ -305,9 +305,9 @@ class Guarantee_model extends CI_Model {
      */
     public function get_guarantee_summary_by_provider()
     {
-        $this->db->select('guarantee_provider, COUNT(*) as count, SUM(guarantee_amount) as total_amount');
+        $this->db->select('vendor_name, COUNT(*) as count, SUM(guarantee_amount) as total_amount');
         $this->db->where('status', 'ใช้งาน');
-        $this->db->group_by('guarantee_provider');
+        $this->db->group_by('vendor_name');
         $this->db->order_by('total_amount', 'DESC');
         $query = $this->db->get('contract_guarantees');
         return $query->result_array();
