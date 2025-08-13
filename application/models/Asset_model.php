@@ -207,6 +207,89 @@ class Asset_model extends CI_Model {
     }
 
     /**
+     * นับจำนวนครุภัณฑ์ทั้งหมด
+     */
+    public function count_assets()
+    {
+        return $this->db->count_all('assets');
+    }
+
+    /**
+     * นับจำนวนครุภัณฑ์ตามสถานะ
+     */
+    public function count_assets_by_status($status)
+    {
+        $this->db->where('status', $status);
+        return $this->db->count_all_results('assets');
+    }
+
+    /**
+     * มูลค่ารวมครุภัณฑ์
+     */
+    public function get_total_asset_value()
+    {
+        $this->db->select('SUM(purchase_price) as total_value');
+        $query = $this->db->get('assets');
+        $row = $query->row_array();
+        return $row['total_value'] ? (float)$row['total_value'] : 0;
+    }
+
+    /**
+     * ดึงรายการสถานที่แบบไม่ซ้ำ
+     */
+    public function get_distinct_locations()
+    {
+        $this->db->distinct();
+        $this->db->select('current_location');
+        $this->db->order_by('current_location', 'ASC');
+        return $this->db->get('assets')->result_array();
+    }
+
+    /**
+     * ดึงรายการประเภทครุภัณฑ์แบบไม่ซ้ำ
+     */
+    public function get_distinct_categories()
+    {
+        $this->db->distinct();
+        $this->db->select('asset_type as category');
+        $this->db->order_by('asset_type', 'ASC');
+        return $this->db->get('assets')->result_array();
+    }
+
+    /**
+     * ดึงข้อมูลครุภัณฑ์สำหรับรายงานสำรวจประจำปี
+     */
+    public function get_assets_for_survey($year, $location = null, $category = null, $status = null)
+    {
+        $this->db->select('a.asset_id, a.asset_id as asset_code, a.asset_name, a.asset_type as category, a.serial_number, a.current_location, a.responsible_person, a.purchase_price, a.status, s.survey_id');
+        $this->db->from('assets a');
+        $this->db->join('annual_surveys s', 'a.asset_id = s.asset_id AND s.survey_year = ' . (int)$year, 'left');
+        $this->db->where('a.status !=', 'จำหน่ายแล้ว');
+        if ($location) {
+            $this->db->where('a.current_location', $location);
+        }
+        if ($category) {
+            $this->db->where('a.asset_type', $category);
+        }
+        if ($status) {
+            $this->db->where('a.status', $status);
+        }
+        $this->db->order_by('a.asset_name', 'ASC');
+        $query = $this->db->get();
+        $assets = $query->result_array();
+
+        foreach ($assets as &$asset) {
+            $depr = $this->calculate_depreciation($asset['asset_code']);
+            $asset['accumulated_depreciation'] = $depr ? $depr['accumulated_depreciation'] : 0;
+            $asset['book_value'] = $depr ? $depr['book_value'] : $asset['purchase_price'];
+            $asset['survey_status'] = $asset['survey_id'] ? 'สำรวจแล้ว' : 'ยังไม่สำรวจ';
+        }
+        unset($asset);
+
+        return $assets;
+    }
+
+    /**
      * ดึงข้อมูลครุภัณฑ์สำหรับรายงาน
      */
     public function get_assets_for_report($year = null, $type = null, $status = null)
