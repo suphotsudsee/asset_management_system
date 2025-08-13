@@ -251,6 +251,15 @@ class Repair_model extends CI_Model {
     }
 
     /**
+     * นับจำนวนการซ่อมแซมตามสถานะ
+     */
+    public function count_repairs_by_status($status)
+    {
+        $this->db->where('status', $status);
+        return $this->db->count_all_results('repairs');
+    }
+
+    /**
      * ดึงข้อมูลการซ่อมแซมล่าสุด
      */
     public function get_recent_repairs($limit = 10)
