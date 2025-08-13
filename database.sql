@@ -110,20 +110,27 @@ CREATE TABLE `depreciation_records` (
 -- ตาราง: contract_guarantees (ค้ำประกันสัญญา)
 CREATE TABLE `contract_guarantees` (
   `guarantee_id` int(11) NOT NULL AUTO_INCREMENT,
-  `contract_number` varchar(100) NOT NULL COMMENT 'เลขที่สัญญา',
+  `asset_id` int(11) NOT NULL COMMENT 'รหัสครุภัณฑ์',
+  `contract_number` varchar(100) DEFAULT NULL COMMENT 'เลขที่สัญญา',
   `guarantee_type` varchar(100) NOT NULL COMMENT 'ประเภทการค้ำประกัน',
-  `guarantee_amount` decimal(15,2) NOT NULL COMMENT 'จำนวนเงินค้ำประกัน',
+  `guarantee_amount` decimal(15,2) DEFAULT NULL COMMENT 'จำนวนเงินค้ำประกัน',
   `start_date` date NOT NULL COMMENT 'วันที่เริ่มต้น',
   `end_date` date NOT NULL COMMENT 'วันที่สิ้นสุด',
-  `guarantee_provider` varchar(255) NOT NULL COMMENT 'ผู้ค้ำประกัน',
+  `vendor_name` varchar(255) NOT NULL COMMENT 'ชื่อผู้จำหน่าย/ผู้ให้บริการ',
+  `vendor_contact` varchar(255) NOT NULL COMMENT 'ข้อมูลติดต่อผู้จำหน่าย',
+  `coverage_details` text DEFAULT NULL COMMENT 'รายละเอียดความคุ้มครอง',
+  `terms_conditions` text DEFAULT NULL COMMENT 'เงื่อนไขและข้อกำหนด',
+  `claim_procedure` text DEFAULT NULL COMMENT 'ขั้นตอนการเคลม',
   `notes` text DEFAULT NULL COMMENT 'บันทึกเพิ่มเติม',
   `status` enum('ใช้งาน','หมดอายุ','ยกเลิก') NOT NULL DEFAULT 'ใช้งาน' COMMENT 'สถานะ',
   `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`guarantee_id`),
   UNIQUE KEY `unique_contract_number` (`contract_number`),
+  KEY `fk_contract_guarantees_asset` (`asset_id`),
   KEY `idx_guarantee_dates` (`start_date`, `end_date`),
-  KEY `idx_guarantee_status` (`status`)
+  KEY `idx_guarantee_status` (`status`),
+  CONSTRAINT `fk_contract_guarantees_asset` FOREIGN KEY (`asset_id`) REFERENCES `assets` (`asset_id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='ตารางค้ำประกันสัญญา';
 
 -- ตาราง: users (ผู้ใช้งานระบบ) - เพิ่มเติมสำหรับการจัดการผู้ใช้
@@ -175,7 +182,9 @@ INSERT INTO `annual_surveys` (`survey_year`, `asset_id`, `condition`, `surveyed_
 (2024, 5, 'ดี', 'คณะกรรมการสำรวจ', '2024-12-01');
 
 -- Insert sample contract guarantee data
-INSERT INTO `contract_guarantees` (`contract_number`, `guarantee_type`, `guarantee_amount`, `start_date`, `end_date`, `guarantee_provider`) VALUES
-('CON2024001', 'หนังสือค้ำประกัน', 50000.00, '2024-01-01', '2024-12-31', 'ธนาคารกรุงเทพ'),
-('CON2024002', 'เงินสดค้ำประกัน', 25000.00, '2024-02-01', '2025-01-31', 'บริษัท ABC จำกัด');
+INSERT INTO `contract_guarantees`
+(`asset_id`, `contract_number`, `guarantee_type`, `guarantee_amount`, `start_date`, `end_date`, `vendor_name`, `vendor_contact`, `status`)
+VALUES
+(1, 'CON2024001', 'หนังสือค้ำประกัน', 50000.00, '2024-01-01', '2024-12-31', 'ธนาคารกรุงเทพ', '02-000-0000', 'ใช้งาน'),
+(2, 'CON2024002', 'เงินสดค้ำประกัน', 25000.00, '2024-02-01', '2025-01-31', 'บริษัท ABC จำกัด', '02-111-1111', 'ใช้งาน');
 

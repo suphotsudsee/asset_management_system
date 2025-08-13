@@ -158,7 +158,7 @@ class Guarantees extends CI_Controller {
             'claim_procedure' => $this->input->post('claim_procedure'),
             'notes' => $this->input->post('notes'),
             'status' => 'ใช้งาน',
-            'created_date' => date('Y-m-d H:i:s')
+            'created_at' => date('Y-m-d H:i:s')
         );
 
         if ($this->Guarantee_model->insert_guarantee($data)) {
@@ -241,7 +241,7 @@ class Guarantees extends CI_Controller {
             'claim_procedure' => $this->input->post('claim_procedure'),
             'notes' => $this->input->post('notes'),
             'status' => $this->input->post('status'),
-            'updated_date' => date('Y-m-d H:i:s')
+            'updated_at' => date('Y-m-d H:i:s')
         );
 
         if ($this->Guarantee_model->update_guarantee($guarantee_id, $data)) {
@@ -339,7 +339,7 @@ class Guarantees extends CI_Controller {
         $guarantee_update = array(
             'end_date' => $new_end_date,
             'status' => 'ใช้งาน',
-            'updated_date' => date('Y-m-d H:i:s')
+            'updated_at' => date('Y-m-d H:i:s')
         );
 
         if ($this->Guarantee_model->renew_guarantee($guarantee_id, $guarantee_update, $renewal_data)) {
@@ -409,7 +409,7 @@ class Guarantees extends CI_Controller {
             'claim_date' => $this->input->post('claim_date') ?: date('Y-m-d'),
             'claim_status' => 'รอดำเนินการ',
             'claimed_by' => 'ผู้ดูแลระบบ', // ในระบบจริงควรใช้ข้อมูลผู้ใช้ที่ล็อกอิน
-            'created_date' => date('Y-m-d H:i:s')
+            'created_at' => date('Y-m-d H:i:s')
         );
 
         if ($this->Guarantee_model->insert_claim($claim_data)) {
