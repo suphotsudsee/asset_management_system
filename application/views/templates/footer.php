@@ -56,16 +56,6 @@
                 language: 'th'
             });
             
-            // Initialize data tables
-            $('.data-table').DataTable({
-                "language": {
-                    "url": "//cdn.datatables.net/plug-ins/1.10.25/i18n/Thai.json"
-                },
-                "responsive": true,
-                "pageLength": 25,
-                "order": [[0, "desc"]]
-            });
-            
             // Confirm delete actions
             $('.btn-delete').on('click', function(e) {
                 e.preventDefault();
