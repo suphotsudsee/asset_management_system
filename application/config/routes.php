@@ -54,4 +54,5 @@ $route['404_override'] = '';
 $route['translate_uri_dashes'] = FALSE;
 
 $route['assets'] = 'assetmanager';           // GET /asset_management_system/assets  → AssetManager controller
-$route['assets/(:any)'] = 'assetmanager/$1'; // รองรับเมธ็อด /assets/create ฯลฯ
+$route['assets/(:any)'] = 'assetmanager/$1';                // รองรับเมธ็อด /assets/create ฯลฯ
+$route['assets/(:any)/(:any)'] = 'assetmanager/$1/$2';      // รองรับเมธ็อดที่มีพารามิเตอร์ เช่น /assets/edit/4
