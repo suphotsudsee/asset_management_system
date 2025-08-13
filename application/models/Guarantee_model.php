@@ -14,9 +14,11 @@ class Guarantee_model extends CI_Model {
      */
     public function get_all_guarantees($limit = null, $offset = null)
     {
-        $this->db->select('g.*, a.asset_id as asset_code, a.asset_name');
+        $this->db->select('g.*');
         $this->db->from('contract_guarantees g');
-        $this->db->join('assets a', 'g.asset_id = a.asset_id', 'left');
+
+        $hasAsset = $this->apply_asset_join();
+
         $this->db->order_by('g.created_at', 'DESC');
 
         if ($limit !== null) {
@@ -24,7 +26,17 @@ class Guarantee_model extends CI_Model {
         }
 
         $query = $this->db->get();
-        return $query->result_array();
+        $results = $query->result_array();
+
+        if (!$hasAsset) {
+            foreach ($results as &$row) {
+                $row['asset_code'] = null;
+                $row['asset_name'] = null;
+            }
+            unset($row);
+        }
+
+        return $results;
     }
 
     /**
@@ -32,12 +44,21 @@ class Guarantee_model extends CI_Model {
      */
     public function get_guarantee_by_id($guarantee_id)
     {
-        $this->db->select('g.*, a.asset_id as asset_code, a.asset_name');
+        $this->db->select('g.*');
         $this->db->from('contract_guarantees g');
-        $this->db->join('assets a', 'g.asset_id = a.asset_id', 'left');
+
+        $hasAsset = $this->apply_asset_join();
+
         $this->db->where('g.guarantee_id', $guarantee_id);
         $query = $this->db->get();
-        return $query->row_array();
+        $result = $query->row_array();
+
+        if (!$hasAsset && $result) {
+            $result['asset_code'] = null;
+            $result['asset_name'] = null;
+        }
+
+        return $result;
     }
 
     /**
@@ -81,15 +102,18 @@ class Guarantee_model extends CI_Model {
      */
     public function search_guarantees($keyword, $status = null, $vendor = null, $expiry_filter = null)
     {
-        $this->db->select('g.*, a.asset_id as asset_code, a.asset_name');
+        $this->db->select('g.*');
         $this->db->from('contract_guarantees g');
-        $this->db->join('assets a', 'g.asset_id = a.asset_id', 'left');
+
+        $hasAsset = $this->apply_asset_join();
 
         if ($keyword) {
             $this->db->group_start();
             $this->db->like('g.contract_number', $keyword);
             $this->db->or_like('g.vendor_name', $keyword);
-            $this->db->or_like('a.asset_name', $keyword);
+            if ($hasAsset) {
+                $this->db->or_like('a.asset_name', $keyword);
+            }
             $this->db->group_end();
         }
 
@@ -124,7 +148,32 @@ class Guarantee_model extends CI_Model {
 
         $this->db->order_by('g.created_at', 'DESC');
         $query = $this->db->get();
-        return $query->result_array();
+        $results = $query->result_array();
+
+        if (!$hasAsset) {
+            foreach ($results as &$row) {
+                $row['asset_code'] = null;
+                $row['asset_name'] = null;
+            }
+            unset($row);
+        }
+
+        return $results;
+    }
+
+    /**
+     * ตรวจสอบและเชื่อมกับตาราง assets หากมีการอ้างอิง asset_id
+     */
+    private function apply_asset_join()
+    {
+        $hasAsset = $this->db->field_exists('asset_id', 'contract_guarantees');
+        if ($hasAsset) {
+            $this->db->select('a.asset_id as asset_code, a.asset_name');
+            $this->db->join('assets a', 'g.asset_id = a.asset_id', 'left');
+        } else {
+            $this->db->select('NULL as asset_code, NULL as asset_name', false);
+        }
+        return $hasAsset;
     }
 
     /**
