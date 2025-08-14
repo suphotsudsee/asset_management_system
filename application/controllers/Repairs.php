@@ -411,22 +411,24 @@ class Repairs extends CI_Controller {
     {
         $data = array();
         
-        $year = $this->input->get('year') ?: date('Y');
-        $month = $this->input->get('month');
-        $status = $this->input->get('status');
-        
-        $data['repairs'] = $this->Repair_model->get_repairs_for_report($year, $month, $status);
-        $data['statistics'] = $this->Repair_model->get_repair_statistics($year);
-        $data['cost_summary'] = $this->Repair_model->get_repair_cost_summary($year);
-        $data['selected_year'] = $year;
-        $data['selected_month'] = $month;
-        $data['selected_status'] = $status;
-        
+        $year     = $this->input->get('year') ?: date('Y');
+        $month    = $this->input->get('month');
+        $status   = $this->input->get('status');
+        $priority = $this->input->get('priority');
+
+        $data['repairs']              = $this->Repair_model->get_repairs_for_report($year, $month, $status);
+        $data['repair_stats']         = $this->Repair_model->get_repair_statistics($year);
+        $data['repair_cost_summary']  = $this->Repair_model->get_repair_cost_summary($year);
+        $data['selected_year']        = $year;
+        $data['selected_month']       = $month;
+        $data['selected_status']      = $status;
+        $data['selected_priority']    = $priority;
+
         $data['page_title'] = 'รายงานการซ่อมแซมครุภัณฑ์ - ระบบจัดการครุภัณฑ์';
-        $data['page_name'] = 'repair_report';
-        
+        $data['page_name']  = 'repair_report';
+
         $this->load->view('templates/header', $data);
-        $this->load->view('repairs/report', $data);
+        $this->load->view('reports/repairs', $data);
         $this->load->view('templates/footer');
     }
 
