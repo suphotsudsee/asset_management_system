@@ -264,7 +264,7 @@ $is_expiring_soon = $days_remaining <= 30 && $days_remaining >= 0;
                         <table class="table table-borderless">
                             <tr>
                                 <td class="font-weight-bold">ข้อมูลติดต่อ:</td>
-                                <td><?php echo htmlspecialchars($guarantee['vendor_contact']); ?></td>
+                                <td><?php echo htmlspecialchars(isset($guarantee['vendor_contact']) ? $guarantee['vendor_contact'] : ''); ?></td>
                             </tr>
                         </table>
                     </div>
