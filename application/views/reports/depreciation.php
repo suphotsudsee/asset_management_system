@@ -1,7 +1,9 @@
 <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
     <h1 class="h2">
         <i class="fas fa-chart-line-down"></i>
-        รายงานค่าเสื่อมราคาครุภัณฑ์ ปี <?php echo ($selected_year + 543); ?>
+        รายงานค่าเสื่อมราคาครุภัณฑ์ ปี <?php $year = isset($selected_year) ? (int)$selected_year : (int)date('Y'); ?>
+<!-- ตัวอย่างในฟอร์ม -->
+<input type="number" name="year" class="form-control" value="<?= $year ?>" min="2000" max="2099">
     </h1>
     <div class="btn-toolbar mb-2 mb-md-0">
         <div class="btn-group mr-2">

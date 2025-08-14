@@ -76,7 +76,9 @@ class Reports extends CI_Controller {
         
         $data['page_title'] = 'รายงานสำรวจครุภัณฑ์ประจำปี ' . ($year + 543);
         $data['page_name'] = 'annual_survey';
-        
+        // ----- **เพิ่มตรงนี้** -----
+    $data['total_assets'] = $this->Asset_model->count_assets(); // <== บรรทัดเดียวจบ
+    
         $this->load->view('templates/header', $data);
         $this->load->view('reports/annual_survey', $data);
         $this->load->view('templates/footer');
@@ -87,35 +89,63 @@ class Reports extends CI_Controller {
      */
     public function depreciation()
     {
-        $data = array();
-        
-        $year = $this->input->get('year') ?: date('Y');
-        $month = $this->input->get('month');
-        $category = $this->input->get('category');
-        
-        // ดึงข้อมูลค่าเสื่อมราคา
-        $data['depreciation_data'] = $this->Depreciation_model->get_depreciation_report($year, $month, $category);
-        
-        // สรุปค่าเสื่อมราคา
-        $data['depreciation_summary'] = $this->Depreciation_model->get_depreciation_summary($year);
-        
-        // กราฟค่าเสื่อมราคารายเดือน
-        $data['monthly_depreciation'] = $this->Depreciation_model->get_monthly_depreciation($year);
-        
-        // รายการประเภท
-        $data['categories'] = $this->Asset_model->get_distinct_categories();
-        
-        $data['selected_year'] = $year;
-        $data['selected_month'] = $month;
-        $data['selected_category'] = $category;
-        
-        $data['page_title'] = 'รายงานค่าเสื่อมราคาครุภัณฑ์ ปี ' . ($year + 543);
-        $data['page_name'] = 'depreciation_report';
-        
+        $asset_id   = $this->input->get('asset_id');
+        $group_by   = $this->input->get('group_by'); // null|'asset'|'month'
+        $year       = trim($this->input->get('year'));     // เช่น 2025
+        $month      = trim($this->input->get('month'));    // 1..12 หรือ '' = ทั้งปี
+        $start_date = trim($this->input->get('start_date'));
+        $end_date   = trim($this->input->get('end_date'));
+    
+        // year+month -> ช่วงของเดือนนั้น
+        if ($year && $month && (!$start_date && !$end_date)) {
+            $start_date = sprintf('%04d-%02d-01', (int)$year, (int)$month);
+            $end_date   = date('Y-m-t', strtotime($start_date));
+        }
+    
+        // มี year อย่างเดียว -> ทั้งปี
+        if ($year && (!$start_date && !$end_date)) {
+            $start_date = $year.'-01-01';
+            $end_date   = $year.'-12-31';
+        }
+    
+        // ไม่มีอะไร -> ปีปัจจุบัน
+        if (!$year && !$start_date && !$end_date) {
+            $year       = date('Y');
+            $start_date = $year.'-01-01';
+            $end_date   = $year.'-12-31';
+        }
+    
+        // กรณีส่ง start/end มา แต่ไม่ได้ส่ง year
+        if (!$year && ($start_date || $end_date)) {
+            $base = $start_date ?: $end_date;
+            $year = substr($base, 0, 4);
+        }
+    
+        $data = [];
+        $data['selected_year']  = (int)$year;
+        $data['selected_month'] = $month ?: '';         // 👈 ส่งค่าไปที่ view เสมอ
+        $data['start_date']     = $start_date;
+        $data['end_date']       = $end_date;
+        $data['asset_id']       = $asset_id ?: null;
+        $data['group_by']       = $group_by ?: null;
+    
+        $data['rows'] = $this->Depreciation_model
+            ->get_depreciation_report($start_date, $end_date, $asset_id, $group_by);
+    
+        $data['summary'] = [
+            'total'   => $this->Depreciation_model->get_total_depreciation_value($start_date, $end_date, $asset_id),
+            'monthly' => $this->Depreciation_model->get_monthly_depreciation_summary($data['selected_year']),
+        ];
+    
+        $data['page_title'] = 'รายงานค่าเสื่อมราคา';
+        $data['page_name']  = 'report_depreciation';
+    
         $this->load->view('templates/header', $data);
         $this->load->view('reports/depreciation', $data);
         $this->load->view('templates/footer');
     }
+    
+    
 
     /**
      * รายงานสถานะครุภัณฑ์
@@ -127,28 +157,30 @@ class Reports extends CI_Controller {
         $location = $this->input->get('location');
         $category = $this->input->get('category');
         $status = $this->input->get('status');
-        
+        $year = $this->input->get('year');
+
         // ดึงข้อมูลครุภัณฑ์ตามสถานะ
-        $data['assets'] = $this->Asset_model->get_assets_by_filters($location, $category, $status);
+        $data['assets'] = $this->Asset_model->get_assets_by_filters($location, $category, $status, $year);
         
         // สถิติตามสถานะ
-        $data['status_stats'] = $this->Asset_model->get_asset_status_statistics();
+        $data['status_stats'] = $this->Asset_model->get_asset_status_statistics($year);
         
         // สถิติตามสถานที่
-        $data['location_stats'] = $this->Asset_model->get_asset_location_statistics();
+        $data['location_stats'] = $this->Asset_model->get_asset_location_statistics($year);
         
         // สถิติตามประเภท
-        $data['category_stats'] = $this->Asset_model->get_asset_category_statistics();
+        $data['category_stats'] = $this->Asset_model->get_asset_category_statistics($year);
         
         // รายการสถานที่และประเภท
-        $data['locations'] = $this->Asset_model->get_distinct_locations();
-        $data['categories'] = $this->Asset_model->get_distinct_categories();
+        $data['locations'] = $this->Asset_model->get_distinct_locations($year);
+        $data['categories'] = $this->Asset_model->get_distinct_categories($year);
         
         $data['selected_location'] = $location;
         $data['selected_category'] = $category;
         $data['selected_status'] = $status;
+        $data['selected_year'] = $year;
         
-        $data['page_title'] = 'รายงานสถานะครุภัณฑ์';
+        $data['page_title'] = 'รายงานสถานะครุภัณฑ์ ปี ' . ($year + 543);
         $data['page_name'] = 'asset_status_report';
         
         $this->load->view('templates/header', $data);
@@ -359,58 +391,47 @@ class Reports extends CI_Controller {
     /**
      * ส่งออกรายงานค่าเสื่อมราคาเป็น CSV
      */
-    public function export_depreciation()
-    {
-        $year = $this->input->get('year') ?: date('Y');
-        $month = $this->input->get('month');
-        $category = $this->input->get('category');
-        
-        $depreciation_data = $this->Depreciation_model->get_depreciation_report($year, $month, $category);
-        
-        $filename = 'depreciation_report_' . $year . '_' . date('Y-m-d_H-i-s') . '.csv';
-        
-        header('Content-Type: text/csv; charset=utf-8');
-        header('Content-Disposition: attachment; filename=' . $filename);
-        
-        $output = fopen('php://output', 'w');
-        
-        // เขียน BOM สำหรับ UTF-8
-        fprintf($output, chr(0xEF).chr(0xBB).chr(0xBF));
-        
-        // เขียนหัวตาราง
-        fputcsv($output, array(
-            'รหัสครุภัณฑ์',
-            'ชื่อครุภัณฑ์',
-            'ประเภท',
-            'วันที่จัดซื้อ',
-            'ราคาทุน',
-            'อายุการใช้งาน (ปี)',
-            'วิธีคิดค่าเสื่อม',
-            'ค่าเสื่อมรายปี',
-            'ค่าเสื่อมสะสม',
-            'มูลค่าตามบัญชี',
-            'สถานะ'
-        ));
-        
-        // เขียนข้อมูล
-        foreach ($depreciation_data as $item) {
-            fputcsv($output, array(
-                $item['asset_code'],
-                $item['asset_name'],
-                $item['category'],
-                $item['purchase_date'],
-                number_format($item['purchase_price'], 2),
-                $item['useful_life'],
-                $item['depreciation_method'],
-                number_format($item['annual_depreciation'], 2),
-                number_format($item['accumulated_depreciation'], 2),
-                number_format($item['book_value'], 2),
-                $item['status']
-            ));
-        }
-        
-        fclose($output);
+/**
+ * ส่งออกรายงานค่าเสื่อมราคาเป็น CSV
+ */
+public function export_depreciation()
+{
+    $asset_id = $this->input->get('asset_id');
+    $year     = trim($this->input->get('year')) ?: date('Y');
+    $month    = trim($this->input->get('month')); // optional
+
+    if ($month) {
+        $start_date = sprintf('%04d-%02d-01', (int)$year, (int)$month);
+        $end_date   = date('Y-m-t', strtotime($start_date));
+    } else {
+        $start_date = $year.'-01-01';
+        $end_date   = $year.'-12-31';
     }
+
+    $rows = $this->Depreciation_model->get_depreciation_report($start_date, $end_date, $asset_id, null);
+
+    $filename = 'depreciation_report_' . $year . '_' . date('Y-m-d_H-i-s') . '.csv';
+    header('Content-Type: text/csv; charset=utf-8');
+    header('Content-Disposition: attachment; filename=' . $filename);
+    $out = fopen('php://output', 'w');
+    fprintf($out, chr(0xEF).chr(0xBB).chr(0xBF));
+
+    fputcsv($out, ['รหัสครุภัณฑ์','ชื่อครุภัณฑ์','วันที่บันทึก','ค่าเสื่อม','ค่าเสื่อมสะสม','มูลค่าตามบัญชี','Serial']);
+
+    foreach ($rows as $r) {
+        fputcsv($out, [
+            $r['asset_id'] ?? '',
+            $r['asset_name'] ?? '',
+            $r['record_date'] ?? '',
+            isset($r['depreciation_amount']) ? number_format($r['depreciation_amount'], 2) : '0.00',
+            isset($r['accumulated_depreciation']) ? number_format($r['accumulated_depreciation'], 2) : '0.00',
+            isset($r['book_value']) ? number_format($r['book_value'], 2) : '0.00',
+            $r['serial_number'] ?? '',
+        ]);
+    }
+    fclose($out);
+}
+
 
     /**
      * พิมพ์รายงานสำรวจครุภัณฑ์
@@ -442,21 +463,29 @@ class Reports extends CI_Controller {
      */
     public function print_depreciation()
     {
-        $data = array();
-        
-        $year = $this->input->get('year') ?: date('Y');
-        $month = $this->input->get('month');
-        $category = $this->input->get('category');
-        
-        $data['depreciation_data'] = $this->Depreciation_model->get_depreciation_report($year, $month, $category);
-        $data['depreciation_summary'] = $this->Depreciation_model->get_depreciation_summary($year);
-        
-        $data['selected_year'] = $year;
-        $data['selected_month'] = $month;
-        $data['selected_category'] = $category;
-        
-        $data['page_title'] = 'รายงานค่าเสื่อมราคาครุภัณฑ์ ปี ' . ($year + 543);
-        
+        $asset_id = $this->input->get('asset_id');
+        $year     = trim($this->input->get('year')) ?: date('Y');
+        $month    = trim($this->input->get('month'));
+    
+        if ($month) {
+            $start_date = sprintf('%04d-%02d-01', (int)$year, (int)$month);
+            $end_date   = date('Y-m-t', strtotime($start_date));
+        } else {
+            $start_date = $year.'-01-01';
+            $end_date   = $year.'-12-31';
+        }
+    
+        $data = [];
+        $data['selected_year'] = (int)$year;
+        $data['start_date']    = $start_date;
+        $data['end_date']      = $end_date;
+        $data['asset_id']      = $asset_id ?: null;
+    
+        $data['depreciation_data']   = $this->Depreciation_model->get_depreciation_report($start_date, $end_date, $asset_id, null);
+        $data['depreciation_summary'] = ['total' => $this->Depreciation_model->get_total_depreciation_value($start_date, $end_date, $asset_id)];
+    
+        $data['page_title'] = 'รายงานค่าเสื่อมราคาครุภัณฑ์ ปี ' . ($data['selected_year'] + 543);
+    
         $this->load->view('reports/print_depreciation', $data);
     }
 

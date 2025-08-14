@@ -74,7 +74,7 @@ class Disposals extends CI_Controller {
         $data = array();
         
         // ดึงรายการครุภัณฑ์ที่สามารถจำหน่ายได้
-        $data['assets'] = $this->Asset_model->get_disposable_assets();
+        $data['disposable_assets'] = $this->Asset_model->get_disposable_assets();
         
         // ถ้ามี asset_id ใน URL ให้เลือกไว้
         $data['selected_asset_id'] = $this->input->get('asset_id');

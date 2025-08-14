@@ -128,25 +128,49 @@ class Survey_model extends CI_Model {
     }
 
     /**
-     * ดึงสถิติการสำรวจครุภัณฑ์
+     * ดึงสถิติการสำรวจ
      */
-    public function get_survey_statistics($year)
+    public function get_survey_statistics($year = null)
     {
-        // คำนวณจำนวนครุภัณฑ์ทั้งหมด (ไม่นับที่จำหน่ายแล้ว)
-        $this->db->where('status !=', 'จำหน่ายแล้ว');
-        $total_assets = $this->db->count_all_results('assets');
-
-        // จำนวนครุภัณฑ์ที่มีการสำรวจในปีที่ระบุ
-        $this->db->where('survey_year', $year);
-        $surveyed = $this->db->count_all_results('annual_surveys');
-
-        $not_surveyed = $total_assets - $surveyed;
-
-        return array(
-            'total_assets' => $total_assets,
-            'surveyed' => $surveyed,
-            'not_surveyed' => $not_surveyed
-        );
+        $stats = array();
+        
+        if ($year) {
+            $this->db->where('survey_year', $year);
+        }
+        
+        // จำนวนการสำรวจทั้งหมด
+        $stats['total'] = $this->db->count_all_results('annual_surveys');
+        
+        // การสำรวจตามสภาพ
+        $this->db->select('condition, COUNT(*) as count');
+        $this->db->group_by('condition');
+        $this->db->order_by('count', 'DESC');
+        if ($year) {
+            $this->db->where('survey_year', $year);
+        }
+        $query = $this->db->get('annual_surveys');
+        $stats['conditions'] = $query->result_array();
+        
+        // การสำรวจตามปี
+        $this->db->select('survey_year, COUNT(*) as count');
+        $this->db->group_by('survey_year');
+        $this->db->order_by('survey_year', 'DESC');
+        $this->db->limit(5);
+        $query = $this->db->get('annual_surveys');
+        $stats['yearly'] = $query->result_array();
+        
+        // ครุภัณฑ์ที่ยังไม่ได้สำรวจ (ถ้าระบุปี)
+        if ($year) {
+            $this->db->select('COUNT(*) as count');
+            $this->db->from('assets a');
+            $this->db->where('a.status !=', 'จำหน่ายแล้ว');
+            $this->db->where('a.asset_id NOT IN (SELECT asset_id FROM annual_surveys WHERE survey_year = ' . $year . ')', null, false);
+            $query = $this->db->get();
+            $result = $query->row_array();
+            $stats['not_surveyed'] = $result['count'];
+        }
+        
+        return $stats;
     }
 
     /**
@@ -154,7 +178,8 @@ class Survey_model extends CI_Model {
      */
     public function get_survey_years()
     {
-        $this->db->select('DISTINCT survey_year');
+        $this->db->select('survey_year');
+        $this->db->distinct();
         $this->db->order_by('survey_year', 'DESC');
         $query = $this->db->get('annual_surveys');
         return array_column($query->result_array(), 'survey_year');

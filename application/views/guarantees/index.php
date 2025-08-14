@@ -51,7 +51,7 @@
                             ค้ำประกันทั้งหมด
                         </div>
                         <div class="h5 mb-0 font-weight-bold text-gray-800">
-                            <?php echo number_format($guarantee_stats['total_guarantees']); ?>
+                            <?php echo number_format($guarantee_stats['total_guarantees'] ?? 0); ?>
                         </div>
                     </div>
                     <div class="col-auto">
@@ -71,7 +71,7 @@
                             ใช้งานได้
                         </div>
                         <div class="h5 mb-0 font-weight-bold text-gray-800">
-                            <?php echo number_format($guarantee_stats['active_guarantees']); ?>
+                            <?php echo number_format($guarantee_stats['active_guarantees'] ?? 0); ?>
                         </div>
                     </div>
                     <div class="col-auto">
@@ -91,7 +91,7 @@
                             ใกล้หมดอายุ (30 วัน)
                         </div>
                         <div class="h5 mb-0 font-weight-bold text-gray-800">
-                            <?php echo number_format($guarantee_stats['expiring_soon']); ?>
+                            <?php echo number_format($guarantee_stats['expiring_soon'] ?? 0); ?>
                         </div>
                     </div>
                     <div class="col-auto">
@@ -111,7 +111,7 @@
                             หมดอายุแล้ว
                         </div>
                         <div class="h5 mb-0 font-weight-bold text-gray-800">
-                            <?php echo number_format($guarantee_stats['expired_guarantees']); ?>
+                            <?php echo number_format($guarantee_stats['expired_guarantees'] ?? 0); ?>
                         </div>
                     </div>
                     <div class="col-auto">
@@ -228,7 +228,7 @@
                                         <strong><?php echo htmlspecialchars($guarantee['asset_name']); ?></strong>
                                         <br>
                                         <small class="text-muted">
-                                            <?php echo htmlspecialchars($guarantee['asset_code']); ?>
+                                            <?php echo htmlspecialchars($guarantee['asset_id']); ?>
                                         </small>
                                     </div>
                                 </td>

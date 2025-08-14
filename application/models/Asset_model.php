@@ -207,89 +207,6 @@ class Asset_model extends CI_Model {
     }
 
     /**
-     * นับจำนวนครุภัณฑ์ทั้งหมด
-     */
-    public function count_assets()
-    {
-        return $this->db->count_all('assets');
-    }
-
-    /**
-     * นับจำนวนครุภัณฑ์ตามสถานะ
-     */
-    public function count_assets_by_status($status)
-    {
-        $this->db->where('status', $status);
-        return $this->db->count_all_results('assets');
-    }
-
-    /**
-     * มูลค่ารวมครุภัณฑ์
-     */
-    public function get_total_asset_value()
-    {
-        $this->db->select('SUM(purchase_price) as total_value');
-        $query = $this->db->get('assets');
-        $row = $query->row_array();
-        return $row['total_value'] ? (float)$row['total_value'] : 0;
-    }
-
-    /**
-     * ดึงรายการสถานที่แบบไม่ซ้ำ
-     */
-    public function get_distinct_locations()
-    {
-        $this->db->distinct();
-        $this->db->select('current_location');
-        $this->db->order_by('current_location', 'ASC');
-        return $this->db->get('assets')->result_array();
-    }
-
-    /**
-     * ดึงรายการประเภทครุภัณฑ์แบบไม่ซ้ำ
-     */
-    public function get_distinct_categories()
-    {
-        $this->db->distinct();
-        $this->db->select('asset_type as category');
-        $this->db->order_by('asset_type', 'ASC');
-        return $this->db->get('assets')->result_array();
-    }
-
-    /**
-     * ดึงข้อมูลครุภัณฑ์สำหรับรายงานสำรวจประจำปี
-     */
-    public function get_assets_for_survey($year, $location = null, $category = null, $status = null)
-    {
-        $this->db->select('a.asset_id, a.asset_id as asset_code, a.asset_name, a.asset_type as category, a.serial_number, a.current_location, a.responsible_person, a.purchase_price, a.status, s.survey_id');
-        $this->db->from('assets a');
-        $this->db->join('annual_surveys s', 'a.asset_id = s.asset_id AND s.survey_year = ' . (int)$year, 'left');
-        $this->db->where('a.status !=', 'จำหน่ายแล้ว');
-        if ($location) {
-            $this->db->where('a.current_location', $location);
-        }
-        if ($category) {
-            $this->db->where('a.asset_type', $category);
-        }
-        if ($status) {
-            $this->db->where('a.status', $status);
-        }
-        $this->db->order_by('a.asset_name', 'ASC');
-        $query = $this->db->get();
-        $assets = $query->result_array();
-
-        foreach ($assets as &$asset) {
-            $depr = $this->calculate_depreciation($asset['asset_code']);
-            $asset['accumulated_depreciation'] = $depr ? $depr['accumulated_depreciation'] : 0;
-            $asset['book_value'] = $depr ? $depr['book_value'] : $asset['purchase_price'];
-            $asset['survey_status'] = $asset['survey_id'] ? 'สำรวจแล้ว' : 'ยังไม่สำรวจ';
-        }
-        unset($asset);
-
-        return $assets;
-    }
-
-    /**
      * ดึงข้อมูลครุภัณฑ์สำหรับรายงาน
      */
     public function get_assets_for_report($year = null, $type = null, $status = null)
@@ -379,4 +296,251 @@ class Asset_model extends CI_Model {
         $query = $this->db->get("assets");
         return $query->result_array();
     }
+
+    // application/models/Asset_model.php
+    public function count_assets()
+    {
+        return $this->db->count_all('assets'); // สมมติชื่อตารางว่า assets
+    }
+
+    /**
+     * นับจำนวนครุภัณฑ์ตามสถานะ
+     * @param string $status สถานะ (เช่น "ใช้งาน", "ชำรุด" ฯลฯ)
+     * @return int
+     */
+    public function count_assets_by_status($status)
+    {
+        $this->db->where('status', $status); // สมมติชื่อคอลัมน์คือ status
+        return $this->db->count_all_results('assets'); // สมมติชื่อตารางคือ assets
+    }
+
+    /**
+     * นับจำนวนรายการซ่อมแซมตามสถานะ
+     * @param string $status สถานะ (เช่น "รอดำเนินการ", "เสร็จสิ้น", "ยกเลิก")
+     * @return int
+     */
+    public function count_repairs_by_status($status)
+    {
+        $this->db->where('status', $status); // สมมติชื่อคอลัมน์คือ status
+        return $this->db->count_all_results('repairs'); // สมมติชื่อตารางคือ repairs
+    }
+
+    /**
+     * นับจำนวนรายการจำหน่ายตามสถานะ
+     * @param string $status สถานะ (เช่น "รอดำเนินการ", "เสร็จสิ้น", "ยกเลิก")
+     * @return int
+     */
+    public function count_disposals_by_status($status)
+    {
+        $this->db->where('status', $status); // สมมติชื่อคอลัมน์คือ status
+        return $this->db->count_all_results('disposals'); // สมมติชื่อตารางคือ disposals
+    }
+
+    public function get_total_asset_value()
+    {
+        $this->db->select_sum('purchase_price');
+        $query = $this->db->get('assets');
+        $result = $query->row_array();
+        return $result['purchase_price'] ?: 0;
+    }
+
+    /**
+     * ดึงรายการครุภัณฑ์สำหรับปีสำรวจที่กำหนด
+     * @param string|int $survey_year
+     * @return array
+     */
+    public function get_assets_for_survey($year)
+{
+    $this->db->where('YEAR(purchase_date)', $year);
+    $query = $this->db->get('assets');
+    return $query->result_array();
+}
+
+
+
+    
+
+    public function get_all()
+{
+    return $this->db->order_by('asset_name','ASC')->get('assets')->result();
+}
+
+public function get_assets_without_active_guarantee()
+{
+    $today = date('Y-m-d');
+
+    $this->db->select('a.asset_id, a.asset_name, a.serial_number, a.serial_number AS asset_code'); // ← เพิ่ม alias
+    $this->db->from('assets a');
+
+    if ($this->db->table_exists('contract_guarantees') && $this->db->field_exists('asset_id', 'contract_guarantees')) {
+        $join = "g.asset_id = a.asset_id
+                 AND g.status = 'ใช้งาน'
+                 AND g.start_date <= ".$this->db->escape($today)."
+                 AND g.end_date   >= ".$this->db->escape($today);
+        $this->db->join('contract_guarantees g', $join, 'left', false);
+        $this->db->where('g.guarantee_id IS NULL', null, false);
+    }
+
+    $this->db->order_by('a.asset_name', 'ASC');
+    return $this->db->get()->result_array();
+}
+
+public function get_assets_for_guarantee_edit($current_asset_id)
+{
+    $list = $this->get_assets_without_active_guarantee();
+
+    if ($current_asset_id) {
+        $hasCurrent = false;
+        foreach ($list as $row) {
+            if ((int)$row['asset_id'] === (int)$current_asset_id) { $hasCurrent = true; break; }
+        }
+        if (!$hasCurrent) {
+            $current = $this->db->select('asset_id, asset_name, serial_number, serial_number AS asset_code') // ← alias
+                                ->from('assets')
+                                ->where('asset_id', $current_asset_id)
+                                ->get()->row_array();
+            if ($current) array_unshift($list, $current);
+        }
+    }
+    return $list;
+}
+/* ================= Helpers (เลือกคอลัมน์ให้เข้ากับสคีมาจริง) ================= */
+private function _col(array $candidates, $table = 'assets')
+{
+    foreach ($candidates as $c) {
+        if ($this->db->field_exists($c, $table)) return $c;
+    }
+    return null;
+}
+
+/* ================= Queries for Reports::asset_status() ================= */
+
+/**
+ * ดึงครุภัณฑ์ตามตัวกรอง (สถานที่, ประเภท, สถานะ, ปี)
+ * คืนฟิลด์มาตรฐานพร้อม alias: category, current_location, asset_code
+ */
+public function get_assets_by_filters($location = null, $category = null, $status = null, $year = null)
+{
+    $table     = 'assets';
+    $locCol    = $this->_col(['current_location','location','room','department'], $table);
+    $catCol    = $this->_col(['category','asset_type','type'], $table);
+    $statusCol = $this->_col(['status','asset_status'], $table);
+    $dateCol   = $this->_col(['purchase_date','acquisition_date','created_at','created_date'], $table);
+
+    // select เบื้องต้น + alias ฟิลด์ที่ view ใช้
+    $this->db->select('a.*');
+    if ($catCol)    $this->db->select("a.$catCol   AS category", false);
+    if ($locCol)    $this->db->select("a.$locCol   AS current_location", false);
+    // alias asset_code จาก serial_number (กัน view เก่าเรียก asset_code)
+    if ($this->db->field_exists('serial_number', $table)) {
+        $this->db->select('a.serial_number AS asset_code', false);
+    }
+
+    $this->db->from($table.' a');
+
+    if ($location !== null && $locCol)   $this->db->where("a.$locCol", $location);
+    if ($category !== null && $catCol)   $this->db->where("a.$catCol", $category);
+    if ($status   !== null && $statusCol)$this->db->where("a.$statusCol", $status);
+
+    if (!empty($year) && $dateCol) {
+        $this->db->where("YEAR(a.$dateCol)", (int)$year);
+    }
+
+    $this->db->order_by('a.asset_name', 'ASC');
+    return $this->db->get()->result_array();
+}
+
+/** นับจำนวนต่อสถานะ (สำหรับกราฟ/การ์ด) */
+public function get_asset_status_statistics($year = null)
+{
+    $table     = 'assets';
+    $statusCol = $this->_col(['status','asset_status'], $table);
+    $dateCol   = $this->_col(['purchase_date','acquisition_date','created_at','created_date'], $table);
+
+    if (!$statusCol) return []; // ไม่มีคอลัมน์สถานะก็จบ
+
+    $this->db->select("a.$statusCol AS status, COUNT(*) AS count", false)
+             ->from($table.' a')
+             ->group_by("a.$statusCol")
+             ->order_by('count', 'DESC');
+
+    if (!empty($year) && $dateCol) $this->db->where("YEAR(a.$dateCol)", (int)$year);
+
+    return $this->db->get()->result_array();
+}
+
+/** นับจำนวนต่อสถานที่ */
+public function get_asset_location_statistics($year = null)
+{
+    $table   = 'assets';
+    $locCol  = $this->_col(['current_location','location','room','department'], $table);
+    $dateCol = $this->_col(['purchase_date','acquisition_date','created_at','created_date'], $table);
+
+    if (!$locCol) return [];
+
+    $this->db->select("a.$locCol AS location, COUNT(*) AS count", false)
+             ->from($table.' a')
+             ->group_by("a.$locCol")
+             ->order_by('count','DESC');
+
+    if (!empty($year) && $dateCol) $this->db->where("YEAR(a.$dateCol)", (int)$year);
+
+    return $this->db->get()->result_array();
+}
+
+/** นับจำนวนต่อประเภท */
+public function get_asset_category_statistics($year = null)
+{
+    $table   = 'assets';
+    $catCol  = $this->_col(['category','asset_type','type'], $table);
+    $dateCol = $this->_col(['purchase_date','acquisition_date','created_at','created_date'], $table);
+
+    if (!$catCol) return [];
+
+    $this->db->select("a.$catCol AS category, COUNT(*) AS count", false)
+             ->from($table.' a')
+             ->group_by("a.$catCol")
+             ->order_by('count','DESC');
+
+    if (!empty($year) && $dateCol) $this->db->where("YEAR(a.$dateCol)", (int)$year);
+
+    return $this->db->get()->result_array();
+}
+
+/** รายชื่อสถานที่ (distinct) */
+public function get_distinct_locations($year = null)
+{
+    $table   = 'assets';
+    $locCol  = $this->_col(['current_location','location','room','department'], $table);
+    $dateCol = $this->_col(['purchase_date','acquisition_date','created_at','created_date'], $table);
+
+    if (!$locCol) return [];
+
+    $this->db->distinct()->select("a.$locCol AS location", false)->from($table.' a');
+    if (!empty($year) && $dateCol) $this->db->where("YEAR(a.$dateCol)", (int)$year);
+    $this->db->order_by('location','ASC');
+    $rows = $this->db->get()->result_array();
+
+    // คืนเป็น array simple ถ้าอยากใช้กับ dropdown ได้สะดวก
+    return array_map(function($r){ return $r['location']; }, $rows);
+}
+
+/** รายชื่อประเภท (distinct) */
+public function get_distinct_categories($year = null)
+{
+    $table   = 'assets';
+    $catCol  = $this->_col(['category','asset_type','type'], $table);
+    $dateCol = $this->_col(['purchase_date','acquisition_date','created_at','created_date'], $table);
+
+    if (!$catCol) return [];
+
+    $this->db->distinct()->select("a.$catCol AS category", false)->from($table.' a');
+    if (!empty($year) && $dateCol) $this->db->where("YEAR(a.$dateCol)", (int)$year);
+    $this->db->order_by('category','ASC');
+    $rows = $this->db->get()->result_array();
+
+    return array_map(function($r){ return $r['category']; }, $rows);
+}
+
+
 }

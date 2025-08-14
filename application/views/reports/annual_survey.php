@@ -97,7 +97,8 @@
                             ครุภัณฑ์ทั้งหมด
                         </div>
                         <div class="h5 mb-0 font-weight-bold text-gray-800">
-                            <?php echo number_format($survey_stats['total_assets']); ?>
+                        <p>ครุภัณฑ์ทั้งหมด: <?php echo !empty($total_assets) ? $total_assets : '0'; ?> รายการ</p>
+
                         </div>
                     </div>
                     <div class="col-auto">
@@ -117,7 +118,13 @@
                             สำรวจแล้ว
                         </div>
                         <div class="h5 mb-0 font-weight-bold text-gray-800">
-                            <?php echo number_format($survey_stats['surveyed']); ?>
+                        <?php
+$surveyed = isset($survey_stats['surveyed']) ? $survey_stats['surveyed'] : 0;
+$total = isset($survey_stats['total_assets']) ? $survey_stats['total_assets'] : 0;
+$percent = ($total > 0) ? ($surveyed / $total) * 100 : 0;
+echo number_format($percent, 1);
+?>%
+
                         </div>
                     </div>
                     <div class="col-auto">
@@ -157,7 +164,11 @@
                             ความคืบหน้า
                         </div>
                         <div class="h5 mb-0 font-weight-bold text-gray-800">
-                            <?php echo number_format(($survey_stats['surveyed'] / $survey_stats['total_assets']) * 100, 1); ?>%
+                        <?php
+if (!isset($survey_stats) || !is_array($survey_stats)) $survey_stats = [];
+?>
+
+
                         </div>
                     </div>
                     <div class="col-auto">
@@ -166,17 +177,6 @@
                 </div>
             </div>
         </div>
-    </div>
-</div>
-<?php endif; ?>
-
-<?php if (!empty($survey_stats)): ?>
-<div class="card mb-4">
-    <div class="card-header">
-        <h6 class="m-0 font-weight-bold text-primary">กราฟสถานะการสำรวจ</h6>
-    </div>
-    <div class="card-body">
-        <canvas id="surveyChart"></canvas>
     </div>
 </div>
 <?php endif; ?>
@@ -297,7 +297,6 @@
     </div>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
 $(document).ready(function() {
     // Initialize DataTable
@@ -386,26 +385,6 @@ $(document).ready(function() {
     $('#year, #location, #category, #status').on('change', function() {
         $(this).closest('form').submit();
     });
-
-    // Survey status chart
-    var ctx = document.getElementById('surveyChart');
-    if (ctx) {
-        new Chart(ctx, {
-            type: 'doughnut',
-            data: {
-                labels: ['สำรวจแล้ว', 'ยังไม่สำรวจ'],
-                datasets: [{
-                    data: [<?php echo $survey_stats['surveyed']; ?>, <?php echo $survey_stats['not_surveyed']; ?>],
-                    backgroundColor: ['#1cc88a', '#f6c23e']
-                }]
-            },
-            options: {
-                plugins: {
-                    legend: { position: 'bottom' }
-                }
-            }
-        });
-    }
 });
 </script>
 

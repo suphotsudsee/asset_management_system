@@ -1,7 +1,7 @@
 <?php
 defined('BASEPATH') OR exit('No direct script access allowed');
 
-class AssetManager extends CI_Controller {
+class Assetmanager extends CI_Controller {
 
     public function __construct()
     {
@@ -47,7 +47,7 @@ class AssetManager extends CI_Controller {
         $data['page_name'] = 'assets';
         
         $this->load->view('templates/header', $data);
-        $this->load->view('assets/index', $data);
+        $this->load->view('assetmanager/index', $data);
         $this->load->view('templates/footer');
     }
 
@@ -71,13 +71,13 @@ class AssetManager extends CI_Controller {
         $data['repairs'] = $this->Repair_model->get_repairs_by_asset($asset_id);
         
         // คำนวณค่าเสื่อมราคา
-        $data['depreciation'] = $this->Depreciation_model->calculate_depreciation($asset_id);
+        $data['depreciation'] = $this->Asset_model->calculate_depreciation($asset_id);
         
         $data['page_title'] = 'รายละเอียดครุภัณฑ์: ' . $data['asset']['asset_name'];
         $data['page_name'] = 'asset_detail';
         
         $this->load->view('templates/header', $data);
-        $this->load->view('assets/view', $data);
+        $this->load->view('assetmanager/view', $data);
         $this->load->view('templates/footer');
     }
 
@@ -91,7 +91,7 @@ class AssetManager extends CI_Controller {
         $data['page_name'] = 'add_asset';
         
         $this->load->view('templates/header', $data);
-        $this->load->view('assets/add', $data);
+        $this->load->view('assetmanager/add', $data);
         $this->load->view('templates/footer');
     }
 
@@ -142,7 +142,7 @@ class AssetManager extends CI_Controller {
 
         if ($this->Asset_model->insert_asset($data)) {
             $this->session->set_flashdata('success', 'เพิ่มครุภัณฑ์เรียบร้อยแล้ว');
-            redirect('assets');
+            redirect('assetmanager');
         } else {
             $this->session->set_flashdata('error', 'เกิดข้อผิดพลาดในการบันทึกข้อมูล');
             $this->add();
@@ -166,7 +166,7 @@ class AssetManager extends CI_Controller {
         $data['page_name'] = 'edit_asset';
         
         $this->load->view('templates/header', $data);
-        $this->load->view('assets/edit', $data);
+        $this->load->view('assetmanager/edit', $data);
         $this->load->view('templates/footer');
     }
 
@@ -223,7 +223,7 @@ class AssetManager extends CI_Controller {
 
         if ($this->Asset_model->update_asset($asset_id, $data)) {
             $this->session->set_flashdata('success', 'อัปเดตข้อมูลครุภัณฑ์เรียบร้อยแล้ว');
-            redirect('assets/view/' . $asset_id);
+            redirect('assetmanager/view/' . $asset_id);
         } else {
             $this->session->set_flashdata('error', 'เกิดข้อผิดพลาดในการอัปเดตข้อมูล');
             $this->edit($asset_id);
@@ -332,5 +332,8 @@ class AssetManager extends CI_Controller {
             ->set_content_type('application/json')
             ->set_output(json_encode($response));
     }
+
+
+    
 }
 

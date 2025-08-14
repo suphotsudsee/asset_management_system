@@ -196,7 +196,8 @@ class Disposal_model extends CI_Model {
      */
     public function get_disposal_methods()
     {
-        $this->db->select('DISTINCT disposal_method');
+        $this->db->select('disposal_method');
+        $this->db->distinct();
         $this->db->order_by('disposal_method', 'ASC');
         $query = $this->db->get('disposals');
         return array_column($query->result_array(), 'disposal_method');
@@ -218,28 +219,72 @@ class Disposal_model extends CI_Model {
 
     /**
      * ดึงข้อมูลการจำหน่ายสำหรับรายงาน
+     * รองรับพารามิเตอร์แบบ (year, month, method) หรือ (start_date, end_date, method)
+     * รวมถึงกรณี (year, method) จากบาง controller เดิม
      */
-    public function get_disposals_for_report($date_from = null, $date_to = null, $method = null)
+    public function get_disposals_for_report($arg1 = null, $arg2 = null, $arg3 = null)
     {
         $this->db->select('d.*, a.asset_name, a.serial_number, a.asset_type, a.purchase_price, a.purchase_date');
         $this->db->from('disposals d');
         $this->db->join('assets a', 'd.asset_id = a.asset_id');
-        
-        if ($date_from) {
-            $this->db->where('d.disposal_date >=', $date_from);
+
+        $start_date = null;
+        $end_date   = null;
+        $method     = null;
+
+        // โหมดปี/เดือน/วิธี
+        if ($arg1 && ctype_digit((string)$arg1) && strlen((string)$arg1) === 4) {
+            $year = (int)$arg1;
+            $isMonth = ($arg2 !== null && ctype_digit((string)$arg2) && (int)$arg2 >= 1 && (int)$arg2 <= 12);
+            if ($isMonth) {
+                $month = (int)$arg2;
+                $start_date = sprintf('%04d-%02d-01', $year, $month);
+                $end_date   = date('Y-m-t', strtotime($start_date));
+                $method     = $arg3 ?: null;
+            } else {
+                // กรณี (year, method)
+                $start_date = sprintf('%04d-01-01', $year);
+                $end_date   = sprintf('%04d-12-31', $year);
+                $method     = $arg2 ?: null;
+            }
+        } else {
+            // โหมดเข้ากันได้ย้อนหลัง: (start_date, end_date, method)
+            $start_date = $arg1 ?: null;
+            $end_date   = $arg2 ?: null;
+            $method     = $arg3 ?: null;
         }
-        
-        if ($date_to) {
-            $this->db->where('d.disposal_date <=', $date_to);
+
+        if (!empty($start_date)) {
+            $this->db->where('d.disposal_date >=', $start_date);
         }
-        
-        if ($method) {
+        if (!empty($end_date)) {
+            $this->db->where('d.disposal_date <=', $end_date);
+        }
+        if (!empty($method)) {
             $this->db->where('d.disposal_method', $method);
         }
-        
+
         $this->db->order_by('d.disposal_date', 'DESC');
         $query = $this->db->get();
         return $query->result_array();
+    }
+
+    /**
+     * สรุปมูลค่าการจำหน่ายตามปี (รวม)
+     */
+    public function get_disposal_value_summary($year = null)
+    {
+        $this->db->select('SUM(d.disposal_price) AS total_disposal_value, SUM(a.purchase_price) AS total_purchase_value', false);
+        $this->db->from('disposals d');
+        $this->db->join('assets a', 'd.asset_id = a.asset_id');
+        if ($year) {
+            $this->db->where('YEAR(d.disposal_date)', (int)$year);
+        }
+        $row = $this->db->get()->row_array();
+        return array(
+            'total_disposal_value' => isset($row['total_disposal_value']) ? (float)$row['total_disposal_value'] : 0.0,
+            'total_purchase_value' => isset($row['total_purchase_value']) ? (float)$row['total_purchase_value'] : 0.0,
+        );
     }
 
     /**
@@ -309,5 +354,8 @@ class Disposal_model extends CI_Model {
             'years_used' => $years
         );
     }
+
+
+
 }
 

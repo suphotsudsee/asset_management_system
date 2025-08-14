@@ -109,17 +109,15 @@
                                 </td>
                                 <td><?php echo date("d/m/Y", strtotime($transfer["transfer_date"])); ?></td>
                                 <td>
+                                    <?php echo $transfer["from_location"]; ?>
                                     <small><?php echo htmlspecialchars($transfer["transfer_by"]); ?></small>
                                 </td>
                                 <td>
                                     <small><?php echo htmlspecialchars(substr($transfer["reason"], 0, 30)) . (strlen($transfer["reason"]) > 30 ? "..." : ""); ?></small>
                                 </td>
-                              <td>
-<?php
-    $statusText = $transfer['status'] ?? '-';
-    echo htmlspecialchars($statusText);
-?>
-</td>
+                                <td>
+                                    <span class="transfer-status"><?php echo $transfer["asset_status"]; ?></span>
+                                </td>
                                 <td>
                                     <div class="btn-group" role="group">
                                         <a href="<?php echo base_url("transfers/view/" . $transfer["transfer_id"]); ?>" 
@@ -269,3 +267,6 @@ $(document).ready(function() {
     });
 });
 </script>
+
+
+

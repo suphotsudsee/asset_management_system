@@ -35,170 +35,149 @@ class Depreciation_model extends CI_Model
         return $this->db->delete($this->table, [$this->pk => $id]);
     }
 
-    /**
-     * Sum of latest accumulated depreciation of all assets
-     *
-     * Reports controller expects the total depreciation value in order to
-     * calculate the book value of the assets.  Each asset can have multiple
-     * depreciation records, therefore we need to take the latest accumulated
-     * depreciation for each asset and then sum those amounts together.
-     *
-     * @return float
-     */
-    public function get_total_depreciation_value()
-    {
-        // Sub-query to get the latest accumulated depreciation per asset
-        $subquery = $this->db->select('MAX(accumulated_depreciation) as accumulated_depreciation')
-                             ->from($this->table)
-                             ->group_by('asset_id')
-                             ->get_compiled_select();
+/* ===== Aggregate helpers for Reports ===== */
 
-        $query = $this->db->select_sum('accumulated_depreciation')
-                          ->from("({$subquery}) AS t")
-                          ->get();
+public function get_total_depreciation_value($start_date = null, $end_date = null, $asset_id = null)
+{
+    $this->_normalize_date_bounds($start_date, $end_date);   // 👈 เพิ่มบรรทัดนี้
 
-        $row = $query->row_array();
-        return isset($row['accumulated_depreciation']) ? (float)$row['accumulated_depreciation'] : 0.0;
+    $table    = 'depreciation_records';
+    $dateCol  = 'record_date';
+    $amountCol= 'depreciation_amount';
+
+    $this->db->select("COALESCE(SUM($amountCol),0) AS total", false)
+             ->from($table);
+
+    if ($asset_id)   $this->db->where('asset_id', (int)$asset_id);
+    if ($start_date) $this->db->where("$dateCol >=", $start_date);
+    if ($end_date)   $this->db->where("$dateCol <=", $end_date);
+
+    $row = $this->db->get()->row_array();
+    return (float)($row['total'] ?? 0);
+}
+
+/**
+ * สรุปค่าเสื่อมรายเดือนของปีที่ระบุ (สำหรับกราฟรายงาน)
+ * @param int|null $year  ค่าเริ่มต้น = ปีปัจจุบัน
+ * @return array [1=>totalJan, 2=>totalFeb, ..., 12=>totalDec]
+ */
+public function get_monthly_depreciation_summary($year = null)
+{
+    $year = $year ?: (int)date('Y');
+    $dateCol   = 'record_date';
+    $amountCol = 'depreciation_amount';
+
+    $this->db->select('MONTH('.$dateCol.') AS m, COALESCE(SUM('.$amountCol.'),0) AS total', false)
+             ->from($this->table)
+             ->where('YEAR('.$dateCol.')', (int)$year)
+             ->group_by('MONTH('.$dateCol.')')
+             ->order_by('m', 'ASC');
+
+    $rows = $this->db->get()->result_array();
+
+    $out = array_fill(1, 12, 0.0);
+    foreach ($rows as $r) {
+        $out[(int)$r['m']] = (float)$r['total'];
     }
+    return $out;
+}
 
-    /**
-     * Detailed depreciation report for assets
-     *
-     * @param int      $year     Fiscal year
-     * @param int|null $month    Optional month (1-12)
-     * @param string   $category Optional asset category
-     * @return array
-     */
-    public function get_depreciation_report($year, $month = null, $category = null)
-    {
-        // Determine the last date to include in the report
-        $end_date = $year . '-12-31';
-        if (!empty($month)) {
-            $last_day = date('t', strtotime($year . '-' . $month . '-01'));
-            $end_date = sprintf('%04d-%02d-%02d', $year, $month, $last_day);
+/** alias เผื่อ controller อื่นเรียกชื่อแตกต่าง */
+public function get_total_depreciation($start_date = null, $end_date = null, $asset_id = null)
+{
+    return $this->get_total_depreciation_value($start_date, $end_date, $asset_id);
+}
+
+
+/* ================= Depreciation reports ================= */
+
+public function get_depreciation_report($start_date = null, $end_date = null, $asset_id = null, $group_by = null)
+{
+    $this->_normalize_date_bounds($start_date, $end_date);   // 👈 เพิ่มบรรทัดนี้
+
+    $table    = 'depreciation_records';
+    $dateCol  = 'record_date';
+    $amountCol= 'depreciation_amount';
+    $accumCol = 'accumulated_depreciation';
+    $bookCol  = 'book_value';
+
+    $this->db->from($table.' d');
+    $this->db->join('assets a', 'a.asset_id = d.asset_id', 'left');
+
+    if ($start_date) $this->db->where("d.$dateCol >=", $start_date);
+    if ($end_date)   $this->db->where("d.$dateCol <=", $end_date);
+    if ($asset_id)   $this->db->where('d.asset_id', (int)$asset_id);
+
+    $select = "d.*, a.asset_name, a.serial_number,
+               d.$dateCol AS record_date, d.$amountCol AS depreciation_amount";
+    $select .= ", d.$accumCol AS accumulated_depreciation, d.$bookCol AS book_value";
+    $this->db->select($select, false)->order_by("d.$dateCol", 'DESC');
+
+    return $this->db->get()->result_array();
+}
+
+/* เผื่อ controller ตัวอื่นเรียกชื่อแตกต่าง */
+public function get_report_depreciation($start_date = null, $end_date = null, $asset_id = null, $group_by = null)
+{
+    $this->_normalize_date_bounds($start_date, $end_date);  // ← เพิ่มบรรทัดนี้
+    return $this->get_depreciation_report($start_date, $end_date, $asset_id, $group_by);
+}
+
+// วางไว้ใน class Depreciation_model (เป็น private helper)
+private function _normalize_date_bounds(&$start_date, &$end_date)
+{
+    $norm = function($s, $is_end = false) {
+        $s = trim((string)$s);
+        if ($s === '') return null;
+
+        // ปีล้วน: 2025
+        if (preg_match('/^\d{4}$/', $s)) {
+            return $is_end ? ($s.'-12-31') : ($s.'-01-01');
         }
 
-        $this->db->select(
-            'a.asset_id,
-             a.asset_id as asset_code,
-             a.asset_name,
-             a.asset_type as category,
-             a.purchase_date,
-             a.purchase_price,
-             a.depreciation_rate,
-             a.status,
-             MAX(d.accumulated_depreciation) as accumulated_depreciation'
-        );
-        $this->db->from('assets a');
-        $this->db->join(
-            'depreciation_records d',
-            "d.asset_id = a.asset_id AND d.record_date <= '{$end_date}'",
-            'left'
-        );
-
-        if (!empty($category)) {
-            $this->db->where('a.asset_type', $category);
+        // ปี-เดือน: 2025-08
+        if (preg_match('/^\d{4}-\d{2}$/', $s)) {
+            $first = $s.'-01';
+            return $is_end ? date('Y-m-t', strtotime($first)) : $first;
         }
 
-        $this->db->group_by('a.asset_id');
-        $this->db->order_by('a.asset_id', 'ASC');
-
-        $records = $this->db->get()->result_array();
-
-        foreach ($records as &$item) {
-            $annual = $item['purchase_price'] * ($item['depreciation_rate'] / 100);
-            $acc   = $item['accumulated_depreciation'] ? (float)$item['accumulated_depreciation'] : 0.0;
-
-            $item['annual_depreciation']    = $annual;
-            $item['accumulated_depreciation'] = $acc;
-            $item['book_value']            = $item['purchase_price'] - $acc;
-            $item['useful_life']           = $item['depreciation_rate'] > 0 ? round(100 / $item['depreciation_rate']) : 0;
-            // Currently the system supports only straight-line method
-            $item['depreciation_method']   = 'เส้นตรง';
+        // d/m/Y (เผื่อค่าจาก datepicker/ผู้ใช้) + พ.ศ.
+        if (preg_match('/^\d{1,2}\/\d{1,2}\/\d{4}$/', $s)) {
+            list($d,$m,$y) = array_map('intval', explode('/', $s));
+            if ($y > 2400) $y -= 543; // แปลง พ.ศ. -> ค.ศ.
+            return sprintf('%04d-%02d-%02d', $y, $m, $d);
         }
 
-        return $records;
-    }
-
-    /**
-     * Summary information for depreciation report
-     *
-     * @param int $year
-     * @return array
-     */
-    public function get_depreciation_summary($year)
-    {
-        $data = $this->get_depreciation_report($year);
-
-        $summary = [
-            'total_cost'            => 0,
-            'annual_depreciation'   => 0,
-            'accumulated_depreciation' => 0,
-            'book_value'            => 0,
-        ];
-
-        foreach ($data as $item) {
-            $summary['total_cost'] += (float)$item['purchase_price'];
-            $summary['annual_depreciation'] += (float)$item['annual_depreciation'];
-            $summary['accumulated_depreciation'] += (float)$item['accumulated_depreciation'];
-            $summary['book_value'] += (float)$item['book_value'];
+        // Y-m-d ปล่อยผ่าน
+        if (preg_match('/^\d{4}-\d{2}-\d{2}$/', $s)) {
+            return $s;
         }
 
-        return $summary;
+        // อื่น ๆ: คืนค่าเดิม (ให้ validation ชั้นนอกจัดการ)
+        return $s;
+    };
+
+    // เติมอีกฝั่งให้ครบถ้าส่งมาฝั่งเดียว
+    if ($start_date && !$end_date) {
+        // ถ้า start เป็นปี/ปี-เดือน จะได้ end ครบโดยอัตโนมัติ
+        $tmpStart = $norm($start_date, false);
+        $tmpEnd   = $norm($start_date, true);
+        $start_date = $tmpStart;
+        $end_date   = $tmpEnd;
+    } elseif ($end_date && !$start_date) {
+        $tmpStart = $norm($end_date, false);
+        $tmpEnd   = $norm($end_date, true);
+        $start_date = $tmpStart;
+        $end_date   = $tmpEnd;
+    } else {
+        $start_date = $norm($start_date, false);
+        $end_date   = $norm($end_date, true);
     }
 
-    /**
-     * Monthly depreciation amounts for a given year
-     *
-     * @param int $year
-     * @return array
-     */
-    public function get_monthly_depreciation($year)
-    {
-        return $this->db->select('MONTH(record_date) as month, SUM(depreciation_amount) as depreciation_amount')
-                        ->from($this->table)
-                        ->where('YEAR(record_date)', $year)
-                        ->group_by('MONTH(record_date)')
-                        ->order_by('MONTH(record_date)', 'ASC')
-                        ->get()
-                        ->result_array();
+    // ถ้ากลับลำ (start > end) ให้สลับ
+    if ($start_date && $end_date && $start_date > $end_date) {
+        $t = $start_date; $start_date = $end_date; $end_date = $t;
     }
+}
 
-    /**
-     * Depreciation amount grouped by asset category for a given year
-     *
-     * @param int $year
-     * @return array
-     */
-    public function get_depreciation_by_category($year)
-    {
-        return $this->db->select('a.asset_type as category, SUM(d.depreciation_amount) as depreciation_amount')
-                        ->from($this->table . ' d')
-                        ->join('assets a', 'a.asset_id = d.asset_id', 'left')
-                        ->where('YEAR(d.record_date)', $year)
-                        ->group_by('a.asset_type')
-                        ->order_by('depreciation_amount', 'DESC')
-                        ->get()
-                        ->result_array();
-    }
-
-    /**
-     * Depreciation trend for the past few years
-     *
-     * @param int $year Reference year
-     * @return array
-     */
-    public function get_depreciation_trend($year)
-    {
-        $start_year = $year - 4; // last 5 years including current
-
-        return $this->db->select('YEAR(record_date) as year, SUM(depreciation_amount) as depreciation_amount')
-                        ->from($this->table)
-                        ->where('YEAR(record_date) >=', $start_year)
-                        ->where('YEAR(record_date) <=', $year)
-                        ->group_by('YEAR(record_date)')
-                        ->order_by('year', 'ASC')
-                        ->get()
-                        ->result_array();
-    }
 }

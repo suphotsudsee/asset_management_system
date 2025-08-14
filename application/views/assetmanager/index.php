@@ -5,10 +5,10 @@
     </h1>
     <div class="btn-toolbar mb-2 mb-md-0">
         <div class="btn-group mr-2">
-            <a href="<?php echo base_url('assets/add'); ?>" class="btn btn-primary">
+            <a href="<?php echo base_url('assetmanager/add'); ?>" class="btn btn-primary">
                 <i class="fas fa-plus"></i> เพิ่มครุภัณฑ์ใหม่
             </a>
-            <a href="<?php echo base_url('assets/export'); ?>" class="btn btn-success">
+            <a href="<?php echo base_url('assetmanager/export'); ?>" class="btn btn-success">
                 <i class="fas fa-download"></i> ส่งออก CSV
             </a>
         </div>
@@ -18,7 +18,7 @@
 <!-- Search and Filter -->
 <div class="card mb-4">
     <div class="card-body">
-        <form method="GET" action="<?php echo base_url('assets'); ?>">
+        <form method="GET" action="<?php echo base_url('assetmanager'); ?>">
             <div class="row">
                 <div class="col-md-3 mb-3">
                     <label for="search">ค้นหา</label>
@@ -105,7 +105,7 @@
                             <tr>
                                 <td><?php echo $asset['asset_id']; ?></td>
                                 <td>
-                                    <a href="<?php echo base_url('assets/view/' . $asset['asset_id']); ?>" 
+                                    <a href="<?php echo base_url('assetmanager/view/' . $asset['asset_id']); ?>" 
                                        class="text-decoration-none font-weight-bold">
                                         <?php echo htmlspecialchars($asset['asset_name']); ?>
                                     </a>
@@ -116,7 +116,8 @@
                                 </td>
                                 <td><?php echo date('d/m/Y', strtotime($asset['purchase_date'])); ?></td>
                                 <td>
-                                    <span class="currency"><?php echo number_format($asset['purchase_price'], 2); ?></span>
+                                ฿<?php echo number_format((float)$asset['purchase_price'], 2); ?>
+                                    
                                 </td>
                                 <td>
                                     <small><?php echo htmlspecialchars($asset['current_location']); ?></small>
@@ -129,11 +130,11 @@
                                 </td>
                                 <td>
                                     <div class="btn-group" role="group">
-                                        <a href="<?php echo base_url('assets/view/' . $asset['asset_id']); ?>" 
+                                        <a href="<?php echo base_url('assetmanager/view/' . $asset['asset_id']); ?>" 
                                            class="btn btn-sm btn-info" title="ดูรายละเอียด">
                                             <i class="fas fa-eye"></i>
                                         </a>
-                                        <a href="<?php echo base_url('assets/edit/' . $asset['asset_id']); ?>" 
+                                        <a href="<?php echo base_url('assetmanager/edit/' . $asset['asset_id']); ?>" 
                                            class="btn btn-sm btn-warning" title="แก้ไข">
                                             <i class="fas fa-edit"></i>
                                         </a>
@@ -155,7 +156,7 @@
                                                     </a>
                                                     <div class="dropdown-divider"></div>
                                                     <a class="dropdown-item text-danger btn-delete" 
-                                                       href="<?php echo base_url('assets/delete/' . $asset['asset_id']); ?>"
+                                                       href="<?php echo base_url('assetmanager/delete/' . $asset['asset_id']); ?>"
                                                        data-item="<?php echo htmlspecialchars($asset['asset_name']); ?>">
                                                         <i class="fas fa-trash"></i> ลบ
                                                     </a>
@@ -210,8 +211,6 @@
 </div>
 
 <script>
-
-
 $(document).ready(function() {
     // Initialize DataTable with custom settings
     $('#assetsTable').DataTable({
@@ -219,7 +218,6 @@ $(document).ready(function() {
             "url": "//cdn.datatables.net/plug-ins/1.10.25/i18n/Thai.json"
         },
         "responsive": true,
-        "destroy": true,
         "pageLength": 25,
         "order": [[0, "desc"]],
         "columnDefs": [
@@ -235,7 +233,7 @@ $(document).ready(function() {
         
         if (confirm('คุณแน่ใจหรือไม่ที่จะเปลี่ยนสถานะ?')) {
             $.ajax({
-                url: '<?php echo base_url('assets/api_update_status'); ?>',
+                url: '<?php echo base_url('assetmanager/api_update_status'); ?>',
                 method: 'POST',
                 data: {
                     asset_id: assetId,

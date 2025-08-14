@@ -14,7 +14,7 @@ class Transfer_model extends CI_Model {
      */
     public function get_all_transfers($limit = null, $offset = null)
     {
-        $this->db->select('t.*, a.asset_name, a.serial_number, a.asset_type');
+        $this->db->select('t.*, a.asset_name, a.serial_number, a.asset_type, a.status as asset_status');
         $this->db->from('transfers t');
         $this->db->join('assets a', 't.asset_id = a.asset_id');
         $this->db->order_by('t.transfer_date', 'DESC');
@@ -32,7 +32,7 @@ class Transfer_model extends CI_Model {
      */
     public function get_transfer_by_id($transfer_id)
     {
-        $this->db->select('t.*, a.asset_name, a.serial_number, a.asset_type');
+        $this->db->select('t.*, a.asset_name, a.serial_number, a.asset_type, a.status as asset_status');
         $this->db->from('transfers t');
         $this->db->join('assets a', 't.asset_id = a.asset_id');
         $this->db->where('t.transfer_id', $transfer_id);
@@ -113,7 +113,7 @@ class Transfer_model extends CI_Model {
      */
     public function search_transfers($keyword, $date_from = null, $date_to = null)
     {
-        $this->db->select('t.*, a.asset_name, a.serial_number, a.asset_type');
+        $this->db->select('t.*, a.asset_name, a.serial_number, a.asset_type, a.status as asset_status');
         $this->db->from('transfers t');
         $this->db->join('assets a', 't.asset_id = a.asset_id');
         
@@ -222,28 +222,68 @@ class Transfer_model extends CI_Model {
 
     /**
      * ดึงข้อมูลการโอนย้ายสำหรับรายงาน
+     * รองรับพารามิเตอร์แบบ (year, month, from_location, to_location)
+     * หรือ (start_date, end_date, location) เพื่อความเข้ากันได้ย้อนหลัง
      */
-    public function get_transfers_for_report($date_from = null, $date_to = null, $location = null)
+    public function get_transfers_for_report($arg1 = null, $arg2 = null, $arg3 = null, $arg4 = null)
     {
         $this->db->select('t.*, a.asset_name, a.serial_number, a.asset_type, a.purchase_price');
         $this->db->from('transfers t');
         $this->db->join('assets a', 't.asset_id = a.asset_id');
-        
-        if ($date_from) {
-            $this->db->where('t.transfer_date >=', $date_from);
+
+        $start_date = null;
+        $end_date   = null;
+        $from_location = null;
+        $to_location   = null;
+        $location_like = null; // compatibility path
+
+        // ตรวจจับรูปแบบ argument
+        // หาก arg1 เป็นปี (เช่น '2025' หรือ 2025) และ arg2 เป็นเดือนหรือว่าง → ใช้ year/month
+        if ($arg1 && ctype_digit((string)$arg1) && (strlen((string)$arg1) === 4)) {
+            $year  = (int)$arg1;
+            $month = $arg2 !== null && ctype_digit((string)$arg2) ? (int)$arg2 : null;
+
+            if ($month) {
+                $start_date = sprintf('%04d-%02d-01', $year, $month);
+                $end_date   = date('Y-m-t', strtotime($start_date));
+            } else {
+                $start_date = sprintf('%04d-01-01', $year);
+                $end_date   = sprintf('%04d-12-31', $year);
+            }
+
+            // ที่เหลือถือว่าเป็น from/to location ตามลำดับ
+            $from_location = $arg3 ?: null;
+            $to_location   = $arg4 ?: null;
+        } else {
+            // โหมดเข้ากันได้ย้อนหลัง: ($start_date, $end_date, $location_like)
+            $start_date   = $arg1 ?: null;
+            $end_date     = $arg2 ?: null;
+            $location_like = $arg3 ?: null;
         }
-        
-        if ($date_to) {
-            $this->db->where('t.transfer_date <=', $date_to);
+
+        if (!empty($start_date)) {
+            $this->db->where('t.transfer_date >=', $start_date);
         }
-        
-        if ($location) {
+        if (!empty($end_date)) {
+            $this->db->where('t.transfer_date <=', $end_date);
+        }
+
+        // กรองสถานที่
+        if ($from_location !== null) {
+            $this->db->like('t.from_location', $from_location);
+        }
+        if ($to_location !== null) {
+            $this->db->like('t.to_location', $to_location);
+        }
+
+        // โหมดเข้ากันได้ย้อนหลัง: like ทั้ง from/to
+        if ($location_like !== null) {
             $this->db->group_start();
-            $this->db->like('t.from_location', $location);
-            $this->db->or_like('t.to_location', $location);
+            $this->db->like('t.from_location', $location_like);
+            $this->db->or_like('t.to_location', $location_like);
             $this->db->group_end();
         }
-        
+
         $this->db->order_by('t.transfer_date', 'DESC');
         $query = $this->db->get();
         return $query->result_array();

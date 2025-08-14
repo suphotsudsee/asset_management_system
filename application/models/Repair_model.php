@@ -223,6 +223,23 @@ class Repair_model extends CI_Model {
     }
 
     /**
+     * สรุปค่าใช้จ่ายการซ่อมแซมตามปี
+     */
+    public function get_repair_cost_summary($year = null)
+    {
+        $this->db->select('SUM(cost) AS total_cost, AVG(cost) AS average_cost, COUNT(*) AS total_repairs', false);
+        if ($year) {
+            $this->db->where('YEAR(request_date)', (int)$year);
+        }
+        $row = $this->db->get('repairs')->row_array();
+        return array(
+            'total_cost'    => isset($row['total_cost']) ? (float)$row['total_cost'] : 0.0,
+            'average_cost'  => isset($row['average_cost']) ? (float)$row['average_cost'] : 0.0,
+            'total_repairs' => isset($row['total_repairs']) ? (int)$row['total_repairs'] : 0,
+        );
+    }
+
+    /**
      * ดึงข้อมูลการซ่อมแซมที่รอดำเนินการ
      */
     public function get_pending_repairs()
@@ -251,15 +268,6 @@ class Repair_model extends CI_Model {
     }
 
     /**
-     * นับจำนวนการซ่อมแซมตามสถานะ
-     */
-    public function count_repairs_by_status($status)
-    {
-        $this->db->where('status', $status);
-        return $this->db->count_all_results('repairs');
-    }
-
-    /**
      * ดึงข้อมูลการซ่อมแซมล่าสุด
      */
     public function get_recent_repairs($limit = 10)
@@ -275,25 +283,41 @@ class Repair_model extends CI_Model {
 
     /**
      * ดึงข้อมูลการซ่อมแซมสำหรับรายงาน
+     * รองรับ (year, month, status) หรือ (start_date, end_date, status)
      */
-    public function get_repairs_for_report($date_from = null, $date_to = null, $status = null)
+    public function get_repairs_for_report($arg1 = null, $arg2 = null, $arg3 = null)
     {
         $this->db->select('r.*, a.asset_name, a.serial_number, a.asset_type, a.purchase_price');
         $this->db->from('repairs r');
         $this->db->join('assets a', 'r.asset_id = a.asset_id');
-        
-        if ($date_from) {
-            $this->db->where('r.request_date >=', $date_from);
+
+        $start_date = null;
+        $end_date   = null;
+        $status     = null;
+
+        // โหมดปี/เดือน/สถานะ
+        if ($arg1 && ctype_digit((string)$arg1) && strlen((string)$arg1) === 4) {
+            $year  = (int)$arg1;
+            $month = ($arg2 !== null && ctype_digit((string)$arg2)) ? (int)$arg2 : null;
+            if ($month) {
+                $start_date = sprintf('%04d-%02d-01', $year, $month);
+                $end_date   = date('Y-m-t', strtotime($start_date));
+            } else {
+                $start_date = sprintf('%04d-01-01', $year);
+                $end_date   = sprintf('%04d-12-31', $year);
+            }
+            $status = $arg3 ?: null;
+        } else {
+            // โหมดเข้ากันได้ย้อนหลัง: (start_date, end_date, status)
+            $start_date = $arg1 ?: null;
+            $end_date   = $arg2 ?: null;
+            $status     = $arg3 ?: null;
         }
-        
-        if ($date_to) {
-            $this->db->where('r.request_date <=', $date_to);
-        }
-        
-        if ($status) {
-            $this->db->where('r.status', $status);
-        }
-        
+
+        if (!empty($start_date)) $this->db->where('r.request_date >=', $start_date);
+        if (!empty($end_date))   $this->db->where('r.request_date <=', $end_date);
+        if (!empty($status))     $this->db->where('r.status', $status);
+
         $this->db->order_by('r.request_date', 'DESC');
         $query = $this->db->get();
         return $query->result_array();
@@ -364,4 +388,11 @@ class Repair_model extends CI_Model {
         $query = $this->db->get('repairs');
         return $query->num_rows() > 0;
     }
+
+    public function count_repairs_by_status($status)
+    {
+        $this->db->where('status', $status);
+        return $this->db->count_all_results('repairs');
+    }
 }
+

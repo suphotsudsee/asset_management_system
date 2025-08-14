@@ -5,7 +5,7 @@
     </h1>
     <div class="btn-toolbar mb-2 mb-md-0">
         <div class="btn-group mr-2">
-            <a href="<?php echo base_url('assets'); ?>" class="btn btn-secondary">
+            <a href="<?php echo base_url('assetmanager'); ?>" class="btn btn-secondary">
                 <i class="fas fa-arrow-left"></i> กลับ
             </a>
         </div>
@@ -187,7 +187,7 @@
                             </button>
                         </div>
                         <div class="col-md-6">
-                            <a href="<?php echo base_url('assets'); ?>" class="btn btn-secondary btn-block">
+                            <a href="<?php echo base_url('assetmanager'); ?>" class="btn btn-secondary btn-block">
                                 <i class="fas fa-times"></i> ยกเลิก
                             </a>
                         </div>

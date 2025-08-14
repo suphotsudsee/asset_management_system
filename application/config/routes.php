@@ -49,10 +49,11 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 | Examples:	my-controller/index	-> my_controller/index
 |		my-controller/my-method	-> my_controller/my_method
 */
-$route['default_controller'] = 'dashboard';
+$route['default_controller'] = 'welcome';
 $route['404_override'] = '';
 $route['translate_uri_dashes'] = FALSE;
 
-$route['assets'] = 'assetmanager';           // GET /asset_management_system/assets  → AssetManager controller
-$route['assets/(:any)'] = 'assetmanager/$1';                // รองรับเมธ็อด /assets/create ฯลฯ
-$route['assets/(:any)/(:any)'] = 'assetmanager/$1/$2';      // รองรับเมธ็อดที่มีพารามิเตอร์ เช่น /assets/edit/4
+$route['depreciation']               = 'depreciation/index';
+$route['depreciation/create']        = 'depreciation/create';
+$route['depreciation/edit/(:num)']   = 'depreciation/edit/$1';
+$route['depreciation/delete/(:num)'] = 'depreciation/delete/$1';

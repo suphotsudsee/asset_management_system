@@ -48,23 +48,22 @@
                     <div class="row">
                         <div class="col-md-12 mb-3">
                             <label for="asset_id" class="required">เลือกครุภัณฑ์</label>
-                            <select class="form-control" id="asset_id" name="asset_id" required>
-                                <option value="">-- เลือกครุภัณฑ์ --</option>
-                                <?php if (!empty($assets)): ?>
-                                    <?php foreach ($assets as $asset): ?>
-                                        <option value="<?php echo $asset['asset_id']; ?>" 
-                                                <?php echo ($selected_asset_id == $asset['asset_id']) ? 'selected' : ''; ?>
-                                                data-asset-code="<?php echo htmlspecialchars($asset['asset_code']); ?>"
-                                                data-asset-name="<?php echo htmlspecialchars($asset['asset_name']); ?>"
-                                                data-category="<?php echo htmlspecialchars($asset['category']); ?>"
-                                                data-location="<?php echo htmlspecialchars($asset['current_location']); ?>"
-                                                data-purchase-date="<?php echo $asset['purchase_date']; ?>"
-                                                data-purchase-price="<?php echo number_format($asset['purchase_price'], 2); ?>">
-                                            <?php echo htmlspecialchars($asset['asset_code'] . ' - ' . $asset['asset_name']); ?>
-                                        </option>
-                                    <?php endforeach; ?>
-                                <?php endif; ?>
-                            </select>
+                            <select name="asset_id" id="asset_id" class="form-control" required>
+    <option value="">-- เลือกครุภัณฑ์ --</option>
+    <?php foreach (($assets ?? []) as $a): 
+        $id    = (int)($a['asset_id'] ?? 0);
+        $name  = $a['asset_name'] ?? '-';
+        // ใช้ asset_code ถ้ามี, ถ้าไม่มีก็ fallback เป็น serial_number, ถ้าไม่มีอีกใส่ค่าว่าง
+        $code  = $a['asset_code'] ?? ($a['serial_number'] ?? '');
+        $label = $code ? "[$code] $name" : $name;
+    ?>
+      <option value="<?= $id ?>"
+        <?= set_select('asset_id', $id, (isset($selected_asset_id) && (int)$selected_asset_id === $id)); ?>>
+        <?= html_escape($label) ?>
+      </option>
+    <?php endforeach; ?>
+</select>
+
                             <small class="form-text text-muted">
                                 แสดงเฉพาะครุภัณฑ์ที่ยังไม่มีค้ำประกันที่ใช้งานอยู่
                             </small>

@@ -136,7 +136,7 @@
                         </table>
                     </div>
                     <div class="text-center">
-                        <a href="<?php echo base_url('assets'); ?>" class="btn btn-primary btn-sm">
+                        <a href="<?php echo base_url('assetmanager'); ?>" class="btn btn-primary btn-sm">
                             <i class="fas fa-eye"></i> ดูทั้งหมด
                         </a>
                     </div>
@@ -144,7 +144,7 @@
                     <div class="text-center text-muted">
                         <i class="fas fa-inbox fa-3x mb-3"></i>
                         <p>ยังไม่มีข้อมูลครุภัณฑ์</p>
-                        <a href="<?php echo base_url('assets/add'); ?>" class="btn btn-primary">
+                        <a href="<?php echo base_url('assetmanager/add'); ?>" class="btn btn-primary">
                             <i class="fas fa-plus"></i> เพิ่มครุภัณฑ์
                         </a>
                     </div>
@@ -178,7 +178,7 @@
                                 <?php foreach ($pending_repairs as $repair): ?>
                                     <tr>
                                         <td>
-                                            <a href="<?php echo base_url('assets/view/' . $repair['asset_id']); ?>" class="text-decoration-none">
+                                            <a href="<?php echo base_url('assetmanager/view/' . $repair['asset_id']); ?>" class="text-decoration-none">
                                                 <?php echo htmlspecialchars($repair['asset_name']); ?>
                                             </a>
                                         </td>
@@ -299,7 +299,7 @@
             <div class="card-body">
                 <div class="row">
                     <div class="col-md-3 col-sm-6 mb-3">
-                        <a href="<?php echo base_url('assets/add'); ?>" class="btn btn-primary btn-block">
+                        <a href="<?php echo base_url('assetmanager/add'); ?>" class="btn btn-primary btn-block">
                             <i class="fas fa-plus"></i>
                             เพิ่มครุภัณฑ์ใหม่
                         </a>

@@ -43,7 +43,7 @@
                         </li>
                         
                         <li class="nav-item">
-                            <a class="nav-link <?php echo (isset($page_name) && strpos($page_name, 'asset') !== false) ? 'active' : ''; ?>" 
+                            <a class="nav-link <?php echo (isset($page_name) && strpos($page_name, 'assetmanager') !== false) ? 'active' : ''; ?>" 
                                href="<?php echo base_url('assetmanager'); ?>">
                                 <i class="fas fa-box"></i>
                                 จัดการครุภัณฑ์
