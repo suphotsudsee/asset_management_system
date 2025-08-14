@@ -57,3 +57,12 @@ $route['depreciation']               = 'depreciation/index';
 $route['depreciation/create']        = 'depreciation/create';
 $route['depreciation/edit/(:num)']   = 'depreciation/edit/$1';
 $route['depreciation/delete/(:num)'] = 'depreciation/delete/$1';
+
+// Routes for asset management
+$route['assets']               = 'assetmanager/index';
+$route['assets/add']           = 'assetmanager/add';
+$route['assets/edit/(:num)']   = 'assetmanager/edit/$1';
+$route['assets/view/(:num)']   = 'assetmanager/view/$1';
+$route['assets/update/(:num)'] = 'assetmanager/update/$1';
+$route['assets/delete/(:num)'] = 'assetmanager/delete/$1';
+$route['assets/export']        = 'assetmanager/export';
