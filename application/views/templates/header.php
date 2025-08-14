@@ -43,19 +43,19 @@
                         </li>
                         
                         <li class="nav-item">
-                            <a class="nav-link d-flex justify-content-between align-items-center <?php echo (isset($page_name) && (strpos($page_name, 'assetmanager') !== false || strpos($page_name, 'user') !== false)) ? '' : 'collapsed'; ?>" href="#systemSubmenu" data-toggle="collapse" aria-expanded="<?php echo (isset($page_name) && (strpos($page_name, 'assetmanager') !== false || strpos($page_name, 'user') !== false)) ? 'true' : 'false'; ?>">
+                            <a class="nav-link d-flex justify-content-between align-items-center <?php echo (isset($page_name) && (strpos($page_name, 'assettypes') !== false || strpos($page_name, 'user') !== false)) ? '' : 'collapsed'; ?>" href="#systemSubmenu" data-toggle="collapse" aria-expanded="<?php echo (isset($page_name) && (strpos($page_name, 'assettypes') !== false || strpos($page_name, 'user') !== false)) ? 'true' : 'false'; ?>">
                                 <span>
                                     <i class="fas fa-cogs"></i>
                                     จัดการระบบ
                                 </span>
                                 <i class="fas fa-chevron-down"></i>
                             </a>
-                            <div id="systemSubmenu" class="collapse <?php echo (isset($page_name) && (strpos($page_name, 'assetmanager') !== false || strpos($page_name, 'user') !== false)) ? 'show' : ''; ?>">
+                            <div id="systemSubmenu" class="collapse <?php echo (isset($page_name) && (strpos($page_name, 'assettypes') !== false || strpos($page_name, 'user') !== false)) ? 'show' : ''; ?>">
                                 <ul class="nav flex-column ml-3">
                                     <li class="nav-item">
-                                        <a class="nav-link <?php echo (isset($page_name) && strpos($page_name, 'assetmanager') !== false) ? 'active' : ''; ?>" href="<?php echo base_url('assetmanager'); ?>">
-                                            <i class="fas fa-box"></i>
-                                            จัดการครุภัณฑ์
+                                        <a class="nav-link <?php echo (isset($page_name) && strpos($page_name, 'assettypes') !== false) ? 'active' : ''; ?>" href="<?php echo base_url('assettypes'); ?>">
+                                            <i class="fas fa-tags"></i>
+                                            ประเภทครุภัณฑ์
                                         </a>
                                     </li>
                                     <li class="nav-item">
@@ -66,13 +66,6 @@
                                     </li>
                                 </ul>
                             </div>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link <?php echo (isset($page_name) && strpos($page_name, 'assettypes') !== false) ? 'active' : ''; ?>"
-                               href="<?php echo base_url('assettypes'); ?>">
-                                <i class="fas fa-tags"></i>
-                                ประเภทครุภัณฑ์
-                            </a>
                         </li>
 
                         
