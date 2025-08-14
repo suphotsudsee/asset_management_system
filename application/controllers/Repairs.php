@@ -71,19 +71,19 @@ class Repairs extends CI_Controller {
     /**
      * แสดงฟอร์มขออนุญาตซ่อมแซม
      */
-    public function add()
+    public function add($asset_id = null)
     {
         $data = array();
-        
+
         // ดึงรายการครุภัณฑ์ที่สามารถซ่อมแซมได้
         $data['assets'] = $this->Asset_model->get_repairable_assets();
-        
-        // ถ้ามี asset_id ใน URL ให้เลือกไว้
-        $data['selected_asset_id'] = $this->input->get('asset_id');
-        
+
+        // รองรับการระบุ asset_id ทั้งจากพารามิเตอร์และ query string
+        $data['selected_asset_id'] = $asset_id !== null ? $asset_id : $this->input->get('asset_id');
+
         $data['page_title'] = 'ขออนุญาตซ่อมแซมครุภัณฑ์ - ระบบจัดการครุภัณฑ์';
         $data['page_name'] = 'add_repair';
-        
+
         $this->load->view('templates/header', $data);
         $this->load->view('repairs/add', $data);
         $this->load->view('templates/footer');
