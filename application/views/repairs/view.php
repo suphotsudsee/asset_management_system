@@ -50,7 +50,7 @@
                     </tr>
                     <tr>
                         <th>ข้อมูลติดต่อ:</th>
-                        <td><?php echo htmlspecialchars($repair['contact_info']); ?></td>
+                        <td><?php echo htmlspecialchars(isset($repair['contact_info']) ? $repair['contact_info'] : ''); ?></td>
                     </tr>
                 </table>
             </div>
