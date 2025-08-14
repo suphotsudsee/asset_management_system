@@ -62,7 +62,13 @@
                     </tr>
                     <tr>
                         <th>ความสำคัญ:</th>
-                        <td><span class="priority-badge"><?php echo htmlspecialchars($repair['priority']); ?></span></td>
+                        <td>
+                            <span class="priority-badge">
+                                <?php echo isset($repair['priority'])
+                                    ? htmlspecialchars($repair['priority'])
+                                    : '<span style="color: gray;">-</span>'; ?>
+                            </span>
+                        </td>
                     </tr>
                     <tr>
                         <th>สถานะ:</th>
