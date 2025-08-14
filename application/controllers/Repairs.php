@@ -165,13 +165,16 @@ class Repairs extends CI_Controller {
         $data = array();
         
         $data['repair'] = $this->Repair_model->get_repair_by_id($repair_id);
-        
+
         if (!$data['repair']) {
             show_404();
         }
-        
+
         // ดึงรายการครุภัณฑ์ที่สามารถซ่อมแซมได้
         $data['assets'] = $this->Asset_model->get_repairable_assets();
+
+        // กำหนดครุภัณฑ์ที่ถูกเลือกไว้เดิมเพื่อใช้ในฟอร์มแก้ไข
+        $data['selected_asset_id'] = $data['repair']['asset_id'];
         
         $data['page_title'] = 'แก้ไขการซ่อมแซม #' . $repair_id;
         $data['page_name'] = 'edit_repair';
