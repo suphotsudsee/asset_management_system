@@ -114,25 +114,25 @@
                     <div class="mb-3">
                         <label for="coverage_details">รายละเอียดความคุ้มครอง</label>
                         <textarea class="form-control" id="coverage_details" name="coverage_details" rows="4"
-                                  placeholder="ระบุรายละเอียดสิ่งที่ได้รับความคุ้มครอง เช่น ชิ้นส่วน, การซ่อมแซม, การเปลี่ยน"><?php echo set_value("coverage_details", $guarantee["coverage_details"]); ?></textarea>
+                                  placeholder="ระบุรายละเอียดสิ่งที่ได้รับความคุ้มครอง เช่น ชิ้นส่วน, การซ่อมแซม, การเปลี่ยน"><?php echo set_value("coverage_details", isset($guarantee["coverage_details"]) ? $guarantee["coverage_details"] : ""); ?></textarea>
                     </div>
 
                     <div class="mb-3">
                         <label for="terms_conditions">เงื่อนไขและข้อกำหนด</label>
                         <textarea class="form-control" id="terms_conditions" name="terms_conditions" rows="4"
-                                  placeholder="เงื่อนไขการใช้ค้ำประกัน, ข้อจำกัด, ข้อยกเว้น"><?php echo set_value("terms_conditions", $guarantee["terms_conditions"]); ?></textarea>
+                                  placeholder="เงื่อนไขการใช้ค้ำประกัน, ข้อจำกัด, ข้อยกเว้น"><?php echo set_value("terms_conditions", isset($guarantee["terms_conditions"]) ? $guarantee["terms_conditions"] : ""); ?></textarea>
                     </div>
 
                     <div class="mb-3">
                         <label for="claim_procedure">ขั้นตอนการเคลม</label>
                         <textarea class="form-control" id="claim_procedure" name="claim_procedure" rows="4"
-                                  placeholder="ขั้นตอนและวิธีการเคลมประกัน, เอกสารที่ต้องใช้"><?php echo set_value("claim_procedure", $guarantee["claim_procedure"]); ?></textarea>
+                                  placeholder="ขั้นตอนและวิธีการเคลมประกัน, เอกสารที่ต้องใช้"><?php echo set_value("claim_procedure", isset($guarantee["claim_procedure"]) ? $guarantee["claim_procedure"] : ""); ?></textarea>
                     </div>
 
                     <div class="mb-3">
                         <label for="notes">หมายเหตุ</label>
                         <textarea class="form-control" id="notes" name="notes" rows="3"
-                                  placeholder="ข้อมูลเพิ่มเติมหรือหมายเหตุอื่นๆ"><?php echo set_value("notes", $guarantee["notes"]); ?></textarea>
+                                  placeholder="ข้อมูลเพิ่มเติมหรือหมายเหตุอื่นๆ"><?php echo set_value("notes", isset($guarantee["notes"]) ? $guarantee["notes"] : ""); ?></textarea>
                     </div>
 
                     <div class="mb-3">
