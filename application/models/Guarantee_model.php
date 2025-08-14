@@ -29,8 +29,13 @@ class Guarantee_model extends CI_Model {
      */
     public function get_guarantee_by_id($guarantee_id)
     {
-        $this->db->where('guarantee_id', $guarantee_id);
-        $query = $this->db->get('contract_guarantees');
+        // Join กับตาราง assets เพื่อดึงข้อมูลครุภัณฑ์ที่เกี่ยวข้อง
+        $this->db->select('g.*, a.asset_name, a.serial_number AS asset_code, a.asset_type AS category, a.current_location');
+        $this->db->from('contract_guarantees g');
+        $this->db->join('assets a', 'a.asset_id = g.asset_id', 'left');
+        $this->db->where('g.guarantee_id', $guarantee_id);
+
+        $query = $this->db->get();
         return $query->row_array();
     }
 
