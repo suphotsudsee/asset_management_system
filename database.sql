@@ -122,25 +122,29 @@ CREATE TABLE `contract_guarantees` (
   `guarantee_id` int(11) NOT NULL,
   `asset_id` int(11) DEFAULT NULL,
   `vendor_name` varchar(255) NOT NULL,
+  `vendor_contact` varchar(255) DEFAULT NULL,
   `contract_number` varchar(100) NOT NULL COMMENT 'เลขที่สัญญา',
   `guarantee_type` varchar(100) NOT NULL COMMENT 'ประเภทการค้ำประกัน',
   `guarantee_amount` decimal(15,2) NOT NULL COMMENT 'จำนวนเงินค้ำประกัน',
   `start_date` date NOT NULL COMMENT 'วันที่เริ่มต้น',
   `end_date` date NOT NULL COMMENT 'วันที่สิ้นสุด',
-  `guarantee_provider` varchar(255) NOT NULL COMMENT 'ผู้ค้ำประกัน',
+  `guarantee_provider` varchar(255) DEFAULT NULL COMMENT 'ผู้ค้ำประกัน',
+  `coverage_details` text COMMENT 'รายละเอียดความคุ้มครอง',
+  `terms_conditions` text COMMENT 'เงื่อนไขและข้อกำหนด',
+  `claim_procedure` text COMMENT 'ขั้นตอนการเคลม',
   `notes` text COMMENT 'บันทึกเพิ่มเติม',
   `status` enum('ใช้งาน','หมดอายุ','ยกเลิก') NOT NULL DEFAULT 'ใช้งาน' COMMENT 'สถานะ',
-  `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+  `created_date` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated_date` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='ตารางค้ำประกันสัญญา';
 
 --
 -- Dumping data for table `contract_guarantees`
 --
 
-INSERT INTO `contract_guarantees` (`guarantee_id`, `asset_id`, `vendor_name`, `contract_number`, `guarantee_type`, `guarantee_amount`, `start_date`, `end_date`, `guarantee_provider`, `notes`, `status`, `created_at`) VALUES
-(1, NULL, '', 'CON2024001', 'หนังสือค้ำประกัน', '50000.00', '2024-01-01', '2024-12-31', 'ธนาคารกรุงเทพ', NULL, 'ใช้งาน', '2025-08-06 03:33:18'),
-(2, NULL, '', 'CON2024002', 'เงินสดค้ำประกัน', '25000.00', '2024-02-01', '2025-01-31', 'บริษัท ABC จำกัด', NULL, 'ใช้งาน', '2025-08-06 03:33:18');
+INSERT INTO `contract_guarantees` (`guarantee_id`, `asset_id`, `vendor_name`, `vendor_contact`, `contract_number`, `guarantee_type`, `guarantee_amount`, `start_date`, `end_date`, `guarantee_provider`, `coverage_details`, `terms_conditions`, `claim_procedure`, `notes`, `status`, `created_date`) VALUES
+(1, NULL, '', '', 'CON2024001', 'หนังสือค้ำประกัน', '50000.00', '2024-01-01', '2024-12-31', 'ธนาคารกรุงเทพ', NULL, NULL, NULL, NULL, 'ใช้งาน', '2025-08-06 03:33:18'),
+(2, NULL, '', '', 'CON2024002', 'เงินสดค้ำประกัน', '25000.00', '2024-02-01', '2025-01-31', 'บริษัท ABC จำกัด', NULL, NULL, NULL, NULL, 'ใช้งาน', '2025-08-06 03:33:18');
 
 -- --------------------------------------------------------
 
