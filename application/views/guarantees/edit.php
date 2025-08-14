@@ -105,8 +105,8 @@
                         </div>
                         <div class="col-md-6 mb-3">
                             <label for="vendor_contact" class="required">ข้อมูลติดต่อ</label>
-                            <input type="text" class="form-control" id="vendor_contact" name="vendor_contact" 
-                                   value="<?php echo set_value("vendor_contact", $guarantee["vendor_contact"]); ?>" required
+                            <input type="text" class="form-control" id="vendor_contact" name="vendor_contact"
+                                   value="<?php echo set_value("vendor_contact", isset($guarantee["vendor_contact"]) ? $guarantee["vendor_contact"] : ""); ?>" required
                                    placeholder="เบอร์โทร, อีเมล, หรือที่อยู่">
                         </div>
                     </div>
