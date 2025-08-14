@@ -39,7 +39,7 @@ CREATE TABLE `annual_surveys` (
   `surveyed_by` varchar(255) NOT NULL COMMENT 'ผู้สำรวจ',
   `survey_date` date NOT NULL COMMENT 'วันที่สำรวจ',
   `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='ตารางการสำรวจประจำปี';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='ตารางการสำรวจประจำปี';
 
 --
 -- Dumping data for table `annual_surveys`
@@ -73,7 +73,7 @@ CREATE TABLE `assets` (
   `responsible_person` varchar(255) NOT NULL COMMENT 'ผู้รับผิดชอบ',
   `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='ตารางครุภัณฑ์';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='ตารางครุภัณฑ์';
 
 --
 -- Dumping data for table `assets`
@@ -96,7 +96,7 @@ CREATE TABLE `asset_types` (
   `type_id` int(11) NOT NULL,
   `type_name` varchar(100) NOT NULL COMMENT 'ชื่อประเภทครุภัณฑ์',
   `description` text COMMENT 'คำอธิบาย'
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='ตารางประเภทครุภัณฑ์';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='ตารางประเภทครุภัณฑ์';
 
 --
 -- Dumping data for table `asset_types`
@@ -136,7 +136,7 @@ CREATE TABLE `contract_guarantees` (
   `status` enum('ใช้งาน','หมดอายุ','ยกเลิก') NOT NULL DEFAULT 'ใช้งาน' COMMENT 'สถานะ',
   `created_date` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `updated_date` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='ตารางค้ำประกันสัญญา';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='ตารางค้ำประกันสัญญา';
 
 --
 -- Dumping data for table `contract_guarantees`
@@ -160,7 +160,7 @@ CREATE TABLE `depreciation_records` (
   `accumulated_depreciation` decimal(15,2) NOT NULL COMMENT 'ค่าเสื่อมราคาสะสม',
   `book_value` decimal(15,2) NOT NULL COMMENT 'มูลค่าตามบัญชี',
   `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='ตารางบันทึกค่าเสื่อมราคา';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='ตารางบันทึกค่าเสื่อมราคา';
 
 --
 -- Dumping data for table `depreciation_records`
@@ -184,7 +184,7 @@ CREATE TABLE `disposals` (
   `disposal_by` varchar(255) NOT NULL COMMENT 'ผู้ดำเนินการจำหน่าย',
   `reason` text COMMENT 'เหตุผลในการจำหน่าย',
   `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='ตารางการจำหน่าย';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='ตารางการจำหน่าย';
 
 -- --------------------------------------------------------
 
@@ -251,7 +251,7 @@ CREATE TABLE `repairs` (
   `requested_by` varchar(255) NOT NULL COMMENT 'ผู้แจ้งซ่อม',
   `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='ตารางการซ่อมแซม';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='ตารางการซ่อมแซม';
 
 --
 -- Dumping data for table `repairs`
@@ -276,7 +276,7 @@ CREATE TABLE `transfers` (
   `transfer_by` varchar(255) NOT NULL COMMENT 'ผู้โอนย้าย',
   `reason` text COMMENT 'เหตุผลในการโอนย้าย',
   `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='ตารางการโอนย้าย';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='ตารางการโอนย้าย';
 
 --
 -- Dumping data for table `transfers`
@@ -303,7 +303,7 @@ CREATE TABLE `users` (
   `last_login` timestamp NULL DEFAULT NULL COMMENT 'เข้าสู่ระบบล่าสุด',
   `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='ตารางผู้ใช้งานระบบ';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='ตารางผู้ใช้งานระบบ';
 
 --
 -- Dumping data for table `users`
