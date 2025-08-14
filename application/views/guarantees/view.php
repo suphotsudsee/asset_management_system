@@ -190,10 +190,14 @@ $is_expiring_soon = $days_remaining <= 30 && $days_remaining >= 0;
                             <tr>
                                 <td class="font-weight-bold">รหัสครุภัณฑ์:</td>
                                 <td>
-                                    <a href="<?php echo base_url('assets/view/' . $guarantee['asset_id']); ?>" 
-                                       class="text-decoration-none font-weight-bold">
-                                        <?php echo htmlspecialchars($guarantee['asset_code']); ?>
-                                    </a>
+                                    <?php if (!empty($guarantee['asset_id'])): ?>
+                                        <a href="<?php echo base_url('assets/view/' . $guarantee['asset_id']); ?>"
+                                           class="text-decoration-none font-weight-bold">
+                                            <?php echo htmlspecialchars($guarantee['asset_code']); ?>
+                                        </a>
+                                    <?php else: ?>
+                                        <span class="text-muted">-</span>
+                                    <?php endif; ?>
                                 </td>
                             </tr>
                             <tr>
@@ -341,11 +345,13 @@ $is_expiring_soon = $days_remaining <= 30 && $days_remaining >= 0;
                             เคลมประกัน
                         </a>
                     <?php endif; ?>
-                    <a href="<?php echo base_url('assets/view/' . $guarantee['asset_id']); ?>" 
-                       class="list-group-item list-group-item-action">
-                        <i class="fas fa-box text-primary"></i>
-                        ดูข้อมูลครุภัณฑ์
-                    </a>
+                    <?php if (!empty($guarantee['asset_id'])): ?>
+                        <a href="<?php echo base_url('assets/view/' . $guarantee['asset_id']); ?>"
+                           class="list-group-item list-group-item-action">
+                            <i class="fas fa-box text-primary"></i>
+                            ดูข้อมูลครุภัณฑ์
+                        </a>
+                    <?php endif; ?>
                     <button type="button" class="list-group-item list-group-item-action text-danger" 
                             onclick="confirmDelete(<?php echo $guarantee['guarantee_id']; ?>)">
                         <i class="fas fa-trash"></i>
