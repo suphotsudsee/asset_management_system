@@ -218,11 +218,23 @@ $is_expiring_soon = $days_remaining <= 30 && $days_remaining >= 0;
                             </tr>
                             <tr>
                                 <td class="font-weight-bold">วันที่จัดซื้อ:</td>
-                                <td><?php echo date('d/m/Y', strtotime($guarantee['purchase_date'])); ?></td>
+                                <td>
+                                    <?php if (!empty($guarantee['purchase_date'])): ?>
+                                        <?php echo date('d/m/Y', strtotime($guarantee['purchase_date'])); ?>
+                                    <?php else: ?>
+                                        <span class="text-muted">-</span>
+                                    <?php endif; ?>
+                                </td>
                             </tr>
                             <tr>
                                 <td class="font-weight-bold">ราคาทุน:</td>
-                                <td><?php echo number_format($guarantee['purchase_price'], 2); ?> บาท</td>
+                                <td>
+                                    <?php if (isset($guarantee['purchase_price'])): ?>
+                                        <?php echo number_format($guarantee['purchase_price'], 2); ?> บาท
+                                    <?php else: ?>
+                                        <span class="text-muted">-</span>
+                                    <?php endif; ?>
+                                </td>
                             </tr>
                         </table>
                     </div>
