@@ -58,7 +58,7 @@
                 <table class="table table-borderless">
                     <tr>
                         <th width="35%">ประเภทการซ่อม:</th>
-                        <td><?php echo htmlspecialchars($repair['repair_type']); ?></td>
+                        <td><?php echo htmlspecialchars(isset($repair['repair_type']) ? $repair['repair_type'] : ''); ?></td>
                     </tr>
                     <tr>
                         <th>ความสำคัญ:</th>

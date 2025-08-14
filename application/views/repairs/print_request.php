@@ -205,7 +205,7 @@
                 <tr>
                     <td class="label">ประเภทการซ่อม</td>
                     <td class="colon">:</td>
-                    <td><?php echo htmlspecialchars($repair['repair_type']); ?></td>
+                    <td><?php echo htmlspecialchars(isset($repair['repair_type']) ? $repair['repair_type'] : ''); ?></td>
                 </tr>
                 <tr>
                     <td class="label">ระดับความสำคัญ</td>
