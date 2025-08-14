@@ -155,7 +155,13 @@ $is_expiring_soon = $days_remaining <= 30 && $days_remaining >= 0;
                             </tr>
                             <tr>
                                 <td class="font-weight-bold">วันที่บันทึก:</td>
-                                <td><?php echo date('d/m/Y H:i', strtotime($guarantee['created_date'])); ?></td>
+                                <td>
+                                    <?php if (!empty($guarantee['created_date'])): ?>
+                                        <?php echo date('d/m/Y H:i', strtotime($guarantee['created_date'])); ?>
+                                    <?php else: ?>
+                                        N/A
+                                    <?php endif; ?>
+                                </td>
                             </tr>
                             <?php if (!empty($guarantee['updated_date'])): ?>
                             <tr>
