@@ -99,7 +99,7 @@
                 <h6>รายละเอียดปัญหา</h6>
                 <div class="card bg-light">
                     <div class="card-body">
-                        <?php echo nl2br(htmlspecialchars($repair['problem_description'])); ?>
+                        <?php echo isset($repair['problem_description']) ? nl2br(htmlspecialchars($repair['problem_description'])) : ''; ?>
                     </div>
                 </div>
             </div>
