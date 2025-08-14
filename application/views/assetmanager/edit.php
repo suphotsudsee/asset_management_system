@@ -41,20 +41,18 @@
                     
                     <div class="col-md-4 mb-3">
                         <label for="asset_type" class="required">ประเภทครุภัณฑ์</label>
-                        <select class="form-control <?php echo form_error('asset_type') ? 'is-invalid' : ''; ?>" 
-                                id="asset_type" name="asset_type" required>
-                            <option value="">เลือกประเภท</option>
-                            <option value="คอมพิวเตอร์" <?php echo set_select('asset_type', 'คอมพิวเตอร์', $asset['asset_type'] == 'คอมพิวเตอร์'); ?>>คอมพิวเตอร์</option>
-                            <option value="เครื่องพิมพ์" <?php echo set_select('asset_type', 'เครื่องพิมพ์', $asset['asset_type'] == 'เครื่องพิมพ์'); ?>>เครื่องพิมพ์</option>
-                            <option value="เครื่องถ่ายเอกสาร" <?php echo set_select('asset_type', 'เครื่องถ่ายเอกสาร', $asset['asset_type'] == 'เครื่องถ่ายเอกสาร'); ?>>เครื่องถ่ายเอกสาร</option>
-                            <option value="โปรเจคเตอร์" <?php echo set_select('asset_type', 'โปรเจคเตอร์', $asset['asset_type'] == 'โปรเจคเตอร์'); ?>>โปรเจคเตอร์</option>
-                            <option value="เครื่องปรับอากาศ" <?php echo set_select('asset_type', 'เครื่องปรับอากาศ', $asset['asset_type'] == 'เครื่องปรับอากาศ'); ?>>เครื่องปรับอากาศ</option>
-                            <option value="รถยนต์" <?php echo set_select('asset_type', 'รถยนต์', $asset['asset_type'] == 'รถยนต์'); ?>>รถยนต์</option>
-                            <option value="เฟอร์นิเจอร์" <?php echo set_select('asset_type', 'เฟอร์นิเจอร์', $asset['asset_type'] == 'เฟอร์นิเจอร์'); ?>>เฟอร์นิเจอร์</option>
-                            <option value="อุปกรณ์เครือข่าย" <?php echo set_select('asset_type', 'อุปกรณ์เครือข่าย', $asset['asset_type'] == 'อุปกรณ์เครือข่าย'); ?>>อุปกรณ์เครือข่าย</option>
-                            <option value="อื่นๆ" <?php echo set_select('asset_type', 'อื่นๆ', $asset['asset_type'] == 'อื่นๆ'); ?>>อื่นๆ</option>
-                        </select>
-                        <div class="invalid-feedback">
+                          <select class="form-control <?php echo form_error('asset_type') ? 'is-invalid' : ''; ?>"
+                                  id="asset_type" name="asset_type" required>
+                              <option value="">เลือกประเภท</option>
+                              <?php if (!empty($asset_types)): ?>
+                                  <?php foreach ($asset_types as $type): ?>
+                                      <option value="<?php echo htmlspecialchars($type); ?>" <?php echo set_select('asset_type', $type, $asset['asset_type'] == $type); ?>>
+                                          <?php echo htmlspecialchars($type); ?>
+                                      </option>
+                                  <?php endforeach; ?>
+                              <?php endif; ?>
+                          </select>
+                          <div class="invalid-feedback">
                             <?php echo form_error('asset_type'); ?>
                         </div>
                     </div>

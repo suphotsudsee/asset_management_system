@@ -126,11 +126,9 @@ class Asset_model extends CI_Model {
      */
     public function get_asset_types()
     {
-        $this->db->distinct();
-        $this->db->select("asset_type");
-        $this->db->order_by("asset_type", "ASC");
-        $query = $this->db->get("assets");
-        return array_column($query->result_array(), "asset_type");
+        $this->db->order_by("type_name", "ASC");
+        $query = $this->db->get("asset_types");
+        return array_column($query->result_array(), "type_name");
     }
 
     /**

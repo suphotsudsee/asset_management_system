@@ -89,6 +89,7 @@ class Assetmanager extends CI_Controller {
         $data = array();
         $data['page_title'] = 'เพิ่มครุภัณฑ์ใหม่ - ระบบจัดการครุภัณฑ์';
         $data['page_name'] = 'add_asset';
+        $data['asset_types'] = $this->Asset_model->get_asset_types();
         
         $this->load->view('templates/header', $data);
         $this->load->view('assetmanager/add', $data);
@@ -164,6 +165,7 @@ class Assetmanager extends CI_Controller {
         
         $data['page_title'] = 'แก้ไขครุภัณฑ์: ' . $data['asset']['asset_name'];
         $data['page_name'] = 'edit_asset';
+        $data['asset_types'] = $this->Asset_model->get_asset_types();
         
         $this->load->view('templates/header', $data);
         $this->load->view('assetmanager/edit', $data);

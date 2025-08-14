@@ -55,6 +55,30 @@ INSERT INTO `annual_surveys` (`survey_id`, `survey_year`, `asset_id`, `condition
 -- --------------------------------------------------------
 
 --
+--
+-- Table structure for table `asset_types`
+--
+CREATE TABLE `asset_types` (
+  `type_id` int(11) NOT NULL,
+  `type_name` varchar(100) NOT NULL,
+  `description` text
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='ตารางประเภทครุภัณฑ์';
+
+--
+-- Dumping data for table `asset_types`
+--
+INSERT INTO `asset_types` (`type_id`, `type_name`, `description`) VALUES
+(1, 'คอมพิวเตอร์', NULL),
+(2, 'เครื่องพิมพ์', NULL),
+(3, 'เครื่องถ่ายเอกสาร', NULL),
+(4, 'โปรเจคเตอร์', NULL),
+(5, 'เครื่องปรับอากาศ', NULL),
+(6, 'รถยนต์', NULL),
+(7, 'เฟอร์นิเจอร์', NULL),
+(8, 'อุปกรณ์เครือข่าย', NULL);
+
+-- --------------------------------------------------------
+
 -- Table structure for table `assets`
 --
 
@@ -287,6 +311,12 @@ INSERT INTO `users` (`user_id`, `username`, `password`, `full_name`, `email`, `r
 --
 
 --
+-- Indexes for table `asset_types`
+--
+ALTER TABLE `asset_types`
+  ADD PRIMARY KEY (`type_id`),
+  ADD UNIQUE KEY `type_name` (`type_name`);
+
 -- Indexes for table `annual_surveys`
 --
 ALTER TABLE `annual_surveys`
@@ -380,6 +410,10 @@ ALTER TABLE `users`
 --
 
 --
+-- AUTO_INCREMENT for table `asset_types`
+ALTER TABLE `asset_types`
+  MODIFY `type_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
+
 -- AUTO_INCREMENT for table `annual_surveys`
 --
 ALTER TABLE `annual_surveys`
