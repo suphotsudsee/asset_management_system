@@ -35,37 +35,18 @@
                     
                     <ul class="nav flex-column">
                         <li class="nav-item">
-                            <a class="nav-link <?php echo (isset($page_name) && $page_name == 'dashboard') ? 'active' : ''; ?>" 
+                            <a class="nav-link <?php echo (isset($page_name) && $page_name == 'dashboard') ? 'active' : ''; ?>"
                                href="<?php echo base_url('dashboard'); ?>">
                                 <i class="fas fa-tachometer-alt"></i>
                                 หน้าหลัก
                             </a>
                         </li>
-                        
+
                         <li class="nav-item">
-                            <a class="nav-link d-flex justify-content-between align-items-center <?php echo (isset($page_name) && (strpos($page_name, 'assettypes') !== false || strpos($page_name, 'user') !== false)) ? '' : 'collapsed'; ?>" href="#systemSubmenu" data-toggle="collapse" aria-expanded="<?php echo (isset($page_name) && (strpos($page_name, 'assettypes') !== false || strpos($page_name, 'user') !== false)) ? 'true' : 'false'; ?>">
-                                <span>
-                                    <i class="fas fa-cogs"></i>
-                                    จัดการระบบ
-                                </span>
-                                <i class="fas fa-chevron-down"></i>
+                            <a class="nav-link <?php echo (isset($page_name) && strpos($page_name, 'asset') !== false && strpos($page_name, 'assettype') === false) ? 'active' : ''; ?>" href="<?php echo base_url('assetmanager'); ?>">
+                                <i class="fas fa-box-open"></i>
+                                จัดการครุภัณฑ์
                             </a>
-                            <div id="systemSubmenu" class="collapse <?php echo (isset($page_name) && (strpos($page_name, 'assettypes') !== false || strpos($page_name, 'user') !== false)) ? 'show' : ''; ?>">
-                                <ul class="nav flex-column ml-3">
-                                    <li class="nav-item">
-                                        <a class="nav-link <?php echo (isset($page_name) && strpos($page_name, 'assettypes') !== false) ? 'active' : ''; ?>" href="<?php echo base_url('assettypes'); ?>">
-                                            <i class="fas fa-tags"></i>
-                                            ประเภทครุภัณฑ์
-                                        </a>
-                                    </li>
-                                    <li class="nav-item">
-                                        <a class="nav-link <?php echo (isset($page_name) && strpos($page_name, 'user') !== false) ? 'active' : ''; ?>" href="<?php echo base_url('users'); ?>">
-                                            <i class="fas fa-users"></i>
-                                            จัดการผู้ใช้
-                                        </a>
-                                    </li>
-                                </ul>
-                            </div>
                         </li>
 
                         
@@ -115,6 +96,32 @@
                                 <i class="fas fa-handshake"></i>
                                 ค้ำประกันสัญญา
                             </a>
+                        </li>
+
+                        <li class="nav-item">
+                            <a class="nav-link d-flex justify-content-between align-items-center <?php echo (isset($page_name) && (strpos($page_name, 'assettypes') !== false || strpos($page_name, 'user') !== false)) ? '' : 'collapsed'; ?>" href="#systemSubmenu" data-toggle="collapse" aria-expanded="<?php echo (isset($page_name) && (strpos($page_name, 'assettypes') !== false || strpos($page_name, 'user') !== false)) ? 'true' : 'false'; ?>">
+                                <span>
+                                    <i class="fas fa-cogs"></i>
+                                    จัดการระบบ
+                                </span>
+                                <i class="fas fa-chevron-down"></i>
+                            </a>
+                            <div id="systemSubmenu" class="collapse <?php echo (isset($page_name) && (strpos($page_name, 'assettypes') !== false || strpos($page_name, 'user') !== false)) ? 'show' : ''; ?>">
+                                <ul class="nav flex-column ml-3">
+                                    <li class="nav-item">
+                                        <a class="nav-link <?php echo (isset($page_name) && strpos($page_name, 'assettypes') !== false) ? 'active' : ''; ?>" href="<?php echo base_url('assettypes'); ?>">
+                                            <i class="fas fa-tags"></i>
+                                            ประเภทครุภัณฑ์
+                                        </a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a class="nav-link <?php echo (isset($page_name) && strpos($page_name, 'user') !== false) ? 'active' : ''; ?>" href="<?php echo base_url('users'); ?>">
+                                            <i class="fas fa-users"></i>
+                                            จัดการผู้ใช้
+                                        </a>
+                                    </li>
+                                </ul>
+                            </div>
                         </li>
 
 
