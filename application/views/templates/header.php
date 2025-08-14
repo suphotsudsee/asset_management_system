@@ -43,11 +43,29 @@
                         </li>
                         
                         <li class="nav-item">
-                            <a class="nav-link <?php echo (isset($page_name) && strpos($page_name, 'assetmanager') !== false) ? 'active' : ''; ?>" 
-                               href="<?php echo base_url('assetmanager'); ?>">
-                                <i class="fas fa-box"></i>
-                                จัดการครุภัณฑ์
+                            <a class="nav-link d-flex justify-content-between align-items-center <?php echo (isset($page_name) && (strpos($page_name, 'assetmanager') !== false || strpos($page_name, 'user') !== false)) ? '' : 'collapsed'; ?>" href="#systemSubmenu" data-toggle="collapse" aria-expanded="<?php echo (isset($page_name) && (strpos($page_name, 'assetmanager') !== false || strpos($page_name, 'user') !== false)) ? 'true' : 'false'; ?>">
+                                <span>
+                                    <i class="fas fa-cogs"></i>
+                                    จัดการระบบ
+                                </span>
+                                <i class="fas fa-chevron-down"></i>
                             </a>
+                            <div id="systemSubmenu" class="collapse <?php echo (isset($page_name) && (strpos($page_name, 'assetmanager') !== false || strpos($page_name, 'user') !== false)) ? 'show' : ''; ?>">
+                                <ul class="nav flex-column ml-3">
+                                    <li class="nav-item">
+                                        <a class="nav-link <?php echo (isset($page_name) && strpos($page_name, 'assetmanager') !== false) ? 'active' : ''; ?>" href="<?php echo base_url('assetmanager'); ?>">
+                                            <i class="fas fa-box"></i>
+                                            จัดการครุภัณฑ์
+                                        </a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a class="nav-link <?php echo (isset($page_name) && strpos($page_name, 'user') !== false) ? 'active' : ''; ?>" href="<?php echo base_url('users'); ?>">
+                                            <i class="fas fa-users"></i>
+                                            จัดการผู้ใช้
+                                        </a>
+                                    </li>
+                                </ul>
+                            </div>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link <?php echo (isset($page_name) && strpos($page_name, 'assettypes') !== false) ? 'active' : ''; ?>"
@@ -106,13 +124,6 @@
                             </a>
                         </li>
 
-                        <li class="nav-item">
-                            <a class="nav-link <?php echo (isset($page_name) && strpos($page_name, 'user') !== false) ? 'active' : ''; ?>"
-                               href="<?php echo base_url('users'); ?>">
-                                <i class="fas fa-users"></i>
-                                จัดการผู้ใช้
-                            </a>
-                        </li>
 
                         <li class="nav-item mt-3">
                             <h6 class="sidebar-heading d-flex justify-content-between align-items-center px-3 mt-4 mb-1 text-muted">
