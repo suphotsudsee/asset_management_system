@@ -14,7 +14,7 @@ class Guarantee_model extends CI_Model {
      */
     public function get_all_guarantees($limit = null, $offset = null)
     {
-        $this->db->order_by('created_at', 'DESC');
+        $this->db->order_by('created_date', 'DESC');
         
         if ($limit !== null) {
             $this->db->limit($limit, $offset);
@@ -283,7 +283,7 @@ public function search_guarantees($keyword = null, $status = null, $vendor = nul
     {
         $data = array(
             'status' => 'หมดอายุ',
-            'updated_at' => date('Y-m-d H:i:s')
+            'updated_date' => date('Y-m-d H:i:s')
         );
         
         $this->db->where('end_date <', date('Y-m-d'));
@@ -404,7 +404,7 @@ public function search_guarantees($keyword = null, $status = null, $vendor = nul
      */
     public function get_recent_guarantees($limit = 10)
     {
-        $this->db->order_by('created_at', 'DESC');
+        $this->db->order_by('created_date', 'DESC');
         $this->db->limit($limit);
         $query = $this->db->get('contract_guarantees');
         return $query->result_array();
