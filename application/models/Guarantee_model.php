@@ -45,6 +45,19 @@ class Guarantee_model extends CI_Model {
     }
 
     /**
+     * ตรวจสอบว่ามีค้ำประกันที่ยังใช้งานอยู่ทับซ้อนช่วงเวลาหรือไม่
+     */
+    public function has_active_guarantee($asset_id, $start_date, $end_date)
+    {
+        $this->db->where('asset_id', $asset_id);
+        $this->db->where('status', 'ใช้งาน');
+        $this->db->where('start_date <=', $end_date);
+        $this->db->where('end_date >=', $start_date);
+        $query = $this->db->get('contract_guarantees');
+        return $query->num_rows() > 0;
+    }
+
+    /**
      * เพิ่มข้อมูลค้ำประกันสัญญา
      */
     public function insert_guarantee($data)
@@ -62,12 +75,58 @@ class Guarantee_model extends CI_Model {
     }
 
     /**
+     * ต่ออายุค้ำประกันและบันทึกประวัติการต่ออายุ
+     */
+    public function renew_guarantee($guarantee_id, $guarantee_update, $renewal_data)
+    {
+        $this->db->trans_start();
+
+        $this->db->where('guarantee_id', $guarantee_id);
+        $this->db->update('contract_guarantees', $guarantee_update);
+
+        $this->db->insert('guarantee_renewals', $renewal_data);
+
+        $this->db->trans_complete();
+        return $this->db->trans_status();
+    }
+
+    /**
      * ลบข้อมูลค้ำประกันสัญญา
      */
     public function delete_guarantee($guarantee_id)
     {
         $this->db->where('guarantee_id', $guarantee_id);
         return $this->db->delete('contract_guarantees');
+    }
+
+    /**
+     * ดึงประวัติการต่ออายุค้ำประกัน
+     */
+    public function get_renewal_history($guarantee_id)
+    {
+        $this->db->where('guarantee_id', $guarantee_id);
+        $this->db->order_by('renewal_date', 'DESC');
+        $query = $this->db->get('guarantee_renewals');
+        return $query->result_array();
+    }
+
+    /**
+     * ดึงประวัติการเคลมของค้ำประกัน
+     */
+    public function get_guarantee_claims($guarantee_id)
+    {
+        $this->db->where('guarantee_id', $guarantee_id);
+        $this->db->order_by('claim_date', 'DESC');
+        $query = $this->db->get('guarantee_claims');
+        return $query->result_array();
+    }
+
+    /**
+     * บันทึกการเคลมประกัน
+     */
+    public function insert_claim($data)
+    {
+        return $this->db->insert('guarantee_claims', $data);
     }
 
    /**
@@ -369,6 +428,32 @@ public function search_guarantees($keyword = null, $status = null, $vendor = nul
     }
 
     /**
+     * ดึงค้ำประกันที่ใช้งานของครุภัณฑ์
+     */
+    public function get_active_guarantee_by_asset($asset_id)
+    {
+        $today = date('Y-m-d');
+        $this->db->where('asset_id', $asset_id);
+        $this->db->where('status', 'ใช้งาน');
+        $this->db->where('start_date <=', $today);
+        $this->db->where('end_date >=', $today);
+        $query = $this->db->get('contract_guarantees');
+        return $query->row_array();
+    }
+
+    /**
+     * อัปเดตสถานะค้ำประกัน
+     */
+    public function update_guarantee_status($guarantee_id, $status)
+    {
+        $this->db->where('guarantee_id', $guarantee_id);
+        return $this->db->update('contract_guarantees', [
+            'status'       => $status,
+            'updated_date' => date('Y-m-d H:i:s')
+        ]);
+    }
+
+    /**
      * ดึงค้ำประกันตามช่วงวันที่
      */
     public function get_guarantees_by_date_range($start_date, $end_date)
@@ -392,11 +477,14 @@ public function search_guarantees($keyword = null, $status = null, $vendor = nul
         return $result['total'] ?: 0;
     }
 
+    /**
+     * ดึงรายชื่อผู้จำหน่าย/ผู้ให้บริการไม่ซ้ำ
+     */
     public function get_distinct_vendors()
     {
-        $this->db->distinct();
-        $this->db->select('vendor');
-        $this->db->from('guarantees');
+        $this->db->select('DISTINCT COALESCE(vendor_name, guarantee_provider) AS vendor_name', false);
+        $this->db->from('contract_guarantees');
+        $this->db->order_by('vendor_name', 'ASC');
         $query = $this->db->get();
         return $query->result_array();
     }
