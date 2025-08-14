@@ -91,13 +91,21 @@
                         </li>
                         
                         <li class="nav-item">
-                            <a class="nav-link <?php echo (isset($page_name) && strpos($page_name, 'guarantee') !== false) ? 'active' : ''; ?>" 
+                            <a class="nav-link <?php echo (isset($page_name) && strpos($page_name, 'guarantee') !== false) ? 'active' : ''; ?>"
                                href="<?php echo base_url('guarantees'); ?>">
                                 <i class="fas fa-handshake"></i>
                                 ค้ำประกันสัญญา
                             </a>
                         </li>
-                        
+
+                        <li class="nav-item">
+                            <a class="nav-link <?php echo (isset($page_name) && strpos($page_name, 'user') !== false) ? 'active' : ''; ?>"
+                               href="<?php echo base_url('users'); ?>">
+                                <i class="fas fa-users"></i>
+                                จัดการผู้ใช้
+                            </a>
+                        </li>
+
                         <li class="nav-item mt-3">
                             <h6 class="sidebar-heading d-flex justify-content-between align-items-center px-3 mt-4 mb-1 text-muted">
                                 <span>รายงาน</span>
