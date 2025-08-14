@@ -68,3 +68,7 @@ $route['assets/delete/(:num)'] = 'assetmanager/delete/$1';
 $route['assets/export']        = 'assetmanager/export';
 $route['assets/maintenance/(:num)'] = 'repairs/add/$1';
 $route['assetmanager/maintenance/(:num)'] = 'repairs/add/$1';
+$route['assettypes']               = 'assettypes/index';
+$route['assettypes/add']           = 'assettypes/add';
+$route['assettypes/edit/(:num)']   = 'assettypes/edit/$1';
+$route['assettypes/delete/(:num)'] = 'assettypes/delete/$1';

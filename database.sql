@@ -4,6 +4,25 @@
 CREATE DATABASE IF NOT EXISTS `asset_management` DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci;
 USE `asset_management`;
 
+-- ตาราง: asset_types (ประเภทครุภัณฑ์)
+CREATE TABLE `asset_types` (
+  `type_id` int(11) NOT NULL AUTO_INCREMENT,
+  `type_name` varchar(100) NOT NULL UNIQUE COMMENT 'ชื่อประเภทครุภัณฑ์',
+  `description` text DEFAULT NULL COMMENT 'คำอธิบาย',
+  PRIMARY KEY (`type_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='ตารางประเภทครุภัณฑ์';
+
+-- ข้อมูลเริ่มต้นสำหรับประเภทครุภัณฑ์
+INSERT INTO `asset_types` (`type_name`, `description`) VALUES
+('คอมพิวเตอร์', NULL),
+('เครื่องพิมพ์', NULL),
+('เครื่องถ่ายเอกสาร', NULL),
+('โปรเจคเตอร์', NULL),
+('เครื่องปรับอากาศ', NULL),
+('รถยนต์', NULL),
+('เฟอร์นิเจอร์', NULL),
+('อุปกรณ์เครือข่าย', NULL);
+
 -- ตาราง: assets (ครุภัณฑ์)
 CREATE TABLE `assets` (
   `asset_id` int(11) NOT NULL AUTO_INCREMENT,

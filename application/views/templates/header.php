@@ -49,6 +49,14 @@
                                 จัดการครุภัณฑ์
                             </a>
                         </li>
+                        <li class="nav-item">
+                            <a class="nav-link <?php echo (isset($page_name) && strpos($page_name, 'assettypes') !== false) ? 'active' : ''; ?>"
+                               href="<?php echo base_url('assettypes'); ?>">
+                                <i class="fas fa-tags"></i>
+                                ประเภทครุภัณฑ์
+                            </a>
+                        </li>
+
                         
                         <li class="nav-item">
                             <a class="nav-link <?php echo (isset($page_name) && strpos($page_name, 'transfer') !== false) ? 'active' : ''; ?>" 
