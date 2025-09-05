@@ -229,37 +229,6 @@
     </div>
 </div>
 
-<!-- Charts Row -->
-<div class="row">
-    <!-- Asset Status Chart -->
-    <div class="col-xl-6 col-lg-7">
-        <div class="card shadow mb-4">
-            <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-                <h6 class="m-0 font-weight-bold text-primary">สถิติครุภัณฑ์ตามสถานะ</h6>
-            </div>
-            <div class="card-body">
-                <div class="chart-pie pt-4 pb-2">
-                    <canvas id="assetStatusChart"></canvas>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Asset Category Chart -->
-    <div class="col-xl-6 col-lg-5">
-        <div class="card shadow mb-4">
-            <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-                <h6 class="m-0 font-weight-bold text-primary">สถิติครุภัณฑ์ตามประเภท</h6>
-            </div>
-            <div class="card-body">
-                <div class="chart-pie pt-4 pb-2">
-                    <canvas id="assetCategoryChart"></canvas>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-
 <!-- Reports Menu -->
 <div class="row">
     <div class="col-lg-12">

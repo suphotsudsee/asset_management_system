@@ -209,21 +209,6 @@
 </div>
 
 <div class="row">
-    <!-- Asset Types Chart -->
-    <div class="col-lg-6 mb-4">
-        <div class="card">
-            <div class="card-header">
-                <h6 class="m-0 font-weight-bold">
-                    <i class="fas fa-chart-pie"></i>
-                    ครุภัณฑ์ตามประเภท
-                </h6>
-            </div>
-            <div class="card-body">
-                <canvas id="assetTypesChart" width="400" height="200"></canvas>
-            </div>
-        </div>
-    </div>
-
     <!-- Recent Activities -->
     <div class="col-lg-6 mb-4">
         <div class="card">
