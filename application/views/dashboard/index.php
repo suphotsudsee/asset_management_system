@@ -208,69 +208,6 @@
     </div>
 </div>
 
-<div class="row">
-    <!-- Recent Activities -->
-    <div class="col-lg-6 mb-4">
-        <div class="card">
-            <div class="card-header">
-                <h6 class="m-0 font-weight-bold">
-                    <i class="fas fa-history"></i>
-                    กิจกรรมล่าสุด
-                </h6>
-            </div>
-            <div class="card-body">
-                <div class="timeline">
-                    <?php if (!empty($recent_transfers)): ?>
-                        <?php foreach (array_slice($recent_transfers, 0, 3) as $transfer): ?>
-                            <div class="timeline-item">
-                                <div class="timeline-marker bg-info"></div>
-                                <div class="timeline-content">
-                                    <h6 class="timeline-title">โอนย้ายครุภัณฑ์</h6>
-                                    <p class="timeline-text">
-                                        <?php echo htmlspecialchars($transfer['asset_name']); ?>
-                                        <br>
-                                        <small class="text-muted">
-                                            จาก <?php echo htmlspecialchars($transfer['from_location']); ?> 
-                                            ไป <?php echo htmlspecialchars($transfer['to_location']); ?>
-                                        </small>
-                                    </p>
-                                    <span class="timeline-date"><?php echo date('d/m/Y', strtotime($transfer['transfer_date'])); ?></span>
-                                </div>
-                            </div>
-                        <?php endforeach; ?>
-                    <?php endif; ?>
-                    
-                    <?php if (!empty($recent_disposals)): ?>
-                        <?php foreach (array_slice($recent_disposals, 0, 2) as $disposal): ?>
-                            <div class="timeline-item">
-                                <div class="timeline-marker bg-secondary"></div>
-                                <div class="timeline-content">
-                                    <h6 class="timeline-title">จำหน่ายครุภัณฑ์</h6>
-                                    <p class="timeline-text">
-                                        <?php echo htmlspecialchars($disposal['asset_name']); ?>
-                                        <br>
-                                        <small class="text-muted">
-                                            วิธีการ: <?php echo htmlspecialchars($disposal['disposal_method']); ?>
-                                        </small>
-                                    </p>
-                                    <span class="timeline-date"><?php echo date('d/m/Y', strtotime($disposal['disposal_date'])); ?></span>
-                                </div>
-                            </div>
-                        <?php endforeach; ?>
-                    <?php endif; ?>
-                </div>
-                
-                <?php if (empty($recent_transfers) && empty($recent_disposals)): ?>
-                    <div class="text-center text-muted">
-                        <i class="fas fa-clock fa-3x mb-3"></i>
-                        <p>ยังไม่มีกิจกรรมล่าสุด</p>
-                    </div>
-                <?php endif; ?>
-            </div>
-        </div>
-    </div>
-</div>
-
 <!-- Quick Actions -->
 <div class="row">
     <div class="col-12">
