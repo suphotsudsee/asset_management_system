@@ -1,7 +1,7 @@
 <?php
 defined('BASEPATH') OR exit('No direct script access allowed');
 
-class Transfers extends CI_Controller {
+class Transfers extends MY_Controller {
 
     public function __construct()
     {
@@ -357,4 +357,3 @@ class Transfers extends CI_Controller {
         $this->load->view('templates/footer');
     }
 }
-

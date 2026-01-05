@@ -150,6 +150,21 @@
                         <i class="fas fa-bars"></i> เมนู
                     </button>
                 </div>
+
+                <?php
+                    $display_name = (string) ($this->session->userdata('full_name') ?: $this->session->userdata('username'));
+                ?>
+                <?php if ($display_name !== ''): ?>
+                    <div class="d-flex justify-content-end align-items-center mb-2">
+                        <span class="text-muted mr-3">
+                            <i class="fas fa-user-circle"></i>
+                            <?php echo htmlspecialchars($display_name); ?>
+                        </span>
+                        <a href="<?php echo site_url('auth/logout'); ?>" class="btn btn-outline-secondary btn-sm">
+                            <i class="fas fa-sign-out-alt"></i> ออกจากระบบ
+                        </a>
+                    </div>
+                <?php endif; ?>
                 
                 <!-- Breadcrumb -->
                 <nav aria-label="breadcrumb" class="mt-3">

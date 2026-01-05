@@ -1,7 +1,7 @@
 <?php
 defined('BASEPATH') OR exit('No direct script access allowed');
 
-class Surveys extends CI_Controller {
+class Surveys extends MY_Controller {
 
     public function __construct()
     {
@@ -359,4 +359,3 @@ class Surveys extends CI_Controller {
             ->set_output(json_encode($surveys));
     }
 }
-

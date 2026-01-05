@@ -1,7 +1,7 @@
 <?php
 defined('BASEPATH') OR exit('No direct script access allowed');
 
-class Assetmanager extends CI_Controller {
+class Assetmanager extends MY_Controller {
 
     public function __construct()
     {

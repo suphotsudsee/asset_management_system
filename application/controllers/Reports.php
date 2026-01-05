@@ -1,7 +1,7 @@
 <?php
 defined('BASEPATH') OR exit('No direct script access allowed');
 
-class Reports extends CI_Controller {
+class Reports extends MY_Controller {
 
     public function __construct()
     {
@@ -527,4 +527,3 @@ public function export_depreciation()
             ->set_output(json_encode($data));
     }
 }
-

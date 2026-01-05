@@ -1,7 +1,7 @@
 <?php
 defined('BASEPATH') OR exit('No direct script access allowed');
 
-class Disposals extends CI_Controller {
+class Disposals extends MY_Controller {
 
     public function __construct()
     {
@@ -413,4 +413,3 @@ class Disposals extends CI_Controller {
         redirect('disposals/view/' . $disposal_id);
     }
 }
-
