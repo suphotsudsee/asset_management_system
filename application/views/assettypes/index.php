@@ -24,9 +24,13 @@
                     </thead>
                     <tbody>
                         <?php foreach ($types as $type): ?>
+                            <?php
+                            $type_name = isset($type['type_name']) ? (string) $type['type_name'] : '';
+                            $description = isset($type['description']) ? (string) $type['description'] : '';
+                            ?>
                             <tr>
-                                <td><?php echo htmlspecialchars($type['type_name']); ?></td>
-                                <td><?php echo htmlspecialchars($type['description']); ?></td>
+                                <td><?php echo htmlspecialchars($type_name); ?></td>
+                                <td><?php echo htmlspecialchars($description); ?></td>
                                 <td>
                                     <a href="<?php echo base_url('assettypes/edit/' . $type['type_id']); ?>" class="btn btn-sm btn-warning">
                                         <i class="fas fa-edit"></i>

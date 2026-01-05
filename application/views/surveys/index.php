@@ -166,7 +166,11 @@
                                     <td><?php echo htmlspecialchars($survey['surveyed_by']); ?></td>
                                     <td><?php echo date("d/m/Y", strtotime($survey['survey_date'])); ?></td>
                                     <td>
-                                        <small><?php echo htmlspecialchars(substr($survey['notes'], 0, 30)) . (strlen($survey['notes']) > 30 ? "..." : ""); ?></small>
+                                        <?php
+                                        $notes = isset($survey['notes']) ? (string) $survey['notes'] : '';
+                                        $notes_preview = substr($notes, 0, 30);
+                                        ?>
+                                        <small><?php echo htmlspecialchars($notes_preview) . (strlen($notes) > 30 ? "..." : ""); ?></small>
                                     </td>
                                     <td>
                                         <div class="btn-group" role="group">
@@ -276,4 +280,3 @@ $(document).ready(function() {
     }
 }
 </style>
-

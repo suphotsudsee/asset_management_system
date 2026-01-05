@@ -128,11 +128,18 @@
 <div class="card mb-4">
     <div class="card-body">
         <form method="GET" action="<?php echo base_url('guarantees'); ?>">
+            <?php
+            // Normalize filter values to strings to avoid null warnings on PHP 8.2+
+            $search_value = isset($search_keyword) ? (string) $search_keyword : '';
+            $selected_status = isset($selected_status) ? (string) $selected_status : '';
+            $selected_vendor = isset($selected_vendor) ? (string) $selected_vendor : '';
+            $selected_expiry_filter = isset($selected_expiry_filter) ? (string) $selected_expiry_filter : '';
+            ?>
             <div class="row">
                 <div class="col-md-3 mb-3">
                     <label for="search">ค้นหา</label>
                     <input type="text" class="form-control" id="search" name="search" 
-                           value="<?php echo htmlspecialchars($search_keyword); ?>"
+                           value="<?php echo htmlspecialchars($search_value); ?>"
                            placeholder="ชื่อครุภัณฑ์, ผู้จำหน่าย, เลขสัญญา">
                 </div>
                 <div class="col-md-2 mb-3">
@@ -215,6 +222,11 @@
                             $days_remaining = ceil((strtotime($guarantee['end_date']) - time()) / (60 * 60 * 24));
                             $is_expired = $days_remaining < 0;
                             $is_expiring_soon = $days_remaining <= 30 && $days_remaining >= 0;
+                            $asset_name = isset($guarantee['asset_name']) ? (string) $guarantee['asset_name'] : '';
+                            $asset_id = isset($guarantee['asset_id']) ? (string) $guarantee['asset_id'] : '';
+                            $guarantee_type = isset($guarantee['guarantee_type']) ? (string) $guarantee['guarantee_type'] : '';
+                            $vendor_name = isset($guarantee['vendor_name']) ? (string) $guarantee['vendor_name'] : '';
+                            $vendor_contact = isset($guarantee['vendor_contact']) ? (string) $guarantee['vendor_contact'] : '';
                             ?>
                             <tr class="<?php echo $is_expired ? 'table-danger' : ($is_expiring_soon ? 'table-warning' : ''); ?>">
                                 <td>
@@ -225,26 +237,26 @@
                                 </td>
                                 <td>
                                     <div>
-                                        <strong><?php echo htmlspecialchars($guarantee['asset_name']); ?></strong>
+                                        <strong><?php echo htmlspecialchars($asset_name); ?></strong>
                                         <br>
                                         <small class="text-muted">
-                                            <?php echo htmlspecialchars($guarantee['asset_id']); ?>
+                                            <?php echo htmlspecialchars($asset_id); ?>
                                         </small>
                                     </div>
                                 </td>
                                 <td>
                                     <span class="badge badge-info">
-                                        <?php echo htmlspecialchars($guarantee['guarantee_type']); ?>
+                                        <?php echo htmlspecialchars($guarantee_type); ?>
                                     </span>
                                 </td>
                                 <td>
                                     <div>
-                                        <strong><?php echo htmlspecialchars($guarantee['vendor_name']); ?></strong>
-                                        <?php if (!empty($guarantee['vendor_contact'])): ?>
+                                        <strong><?php echo htmlspecialchars($vendor_name); ?></strong>
+                                        <?php if ($vendor_contact !== ''): ?>
                                             <br>
                                             <small class="text-muted">
                                                 <i class="fas fa-phone"></i>
-                                                <?php echo htmlspecialchars($guarantee['vendor_contact']); ?>
+                                                <?php echo htmlspecialchars($vendor_contact); ?>
                                             </small>
                                         <?php endif; ?>
                                     </div>
@@ -463,4 +475,3 @@ function confirmDelete(guaranteeId) {
     background-color: rgba(220, 53, 69, 0.1) !important;
 }
 </style>
-

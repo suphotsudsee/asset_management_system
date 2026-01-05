@@ -50,6 +50,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
  * @author		EllisLab Dev Team
  * @link		https://codeigniter.com/userguide3/general/controllers.html
  */
+#[AllowDynamicProperties]
 class CI_Controller {
 
 	/**
@@ -65,6 +66,66 @@ class CI_Controller {
 	 * @var	CI_Loader
 	 */
 	public $load;
+
+	/**
+	 * @var	CI_Benchmark
+	 */
+	public $benchmark;
+
+	/**
+	 * @var	CI_Hooks
+	 */
+	public $hooks;
+
+	/**
+	 * @var	CI_Config
+	 */
+	public $config;
+
+	/**
+	 * @var	CI_Utf8
+	 */
+	public $utf8;
+
+	/**
+	 * @var	CI_URI
+	 */
+	public $uri;
+
+	/**
+	 * @var	CI_Router
+	 */
+	public $router;
+
+	/**
+	 * @var	CI_Output
+	 */
+	public $output;
+
+	/**
+	 * @var	CI_Security
+	 */
+	public $security;
+
+	/**
+	 * @var	CI_Input
+	 */
+	public $input;
+
+	/**
+	 * @var	CI_Lang
+	 */
+	public $lang;
+
+	/**
+	 * @var	CI_DB_driver
+	 */
+	public $db;
+
+	/**
+	 * @var	CI_Log
+	 */
+	public $log;
 
 	/**
 	 * Class constructor

@@ -84,6 +84,15 @@ class CI_URI {
 	public $rsegments = array();
 
 	/**
+	 * Config instance
+	 *
+	 * Holds reference to the shared Config class to avoid dynamic property creation warnings.
+	 *
+	 * @var	object
+	 */
+	protected $config;
+
+	/**
 	 * Permitted URI chars
 	 *
 	 * PCRE character group allowed in URI segments
